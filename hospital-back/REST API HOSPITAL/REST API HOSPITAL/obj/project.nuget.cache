@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cFHDuPiYB8E7yCQ7bMcFkF93Y1Em0w0KsNNgXzMBKkyo+FPNWKTYaGRFw0khGu1U1WFUzMFkS0l5S/DQBvqVRg==",
+  "dgSpecHash": "p/QYu7eUn7uR+M7gCP2g5h+rqq7ZQdRKynMokDySzGUVeeshmh7jpaT0osTByuI3+5wAH5ki9fH2H3Es4mXW4Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\javie\\Desktop\\ME\\hospital\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj",
+  "projectFilePath": "C:\\Users\\javie\\Desktop\\ME\\BD\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\javie\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "C:\\Users\\javie\\.nuget\\packages\\microsoft.openapi\\1.2.3\\microsoft.openapi.1.2.3.nupkg.sha512",

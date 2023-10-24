@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\javie\\Desktop\\ME\\hospital\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj": {}
+    "C:\\Users\\javie\\Desktop\\ME\\BD\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj": {}
   },
   "projects": {
-    "C:\\Users\\javie\\Desktop\\ME\\hospital\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj": {
+    "C:\\Users\\javie\\Desktop\\ME\\BD\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\javie\\Desktop\\ME\\hospital\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj",
+        "projectUniqueName": "C:\\Users\\javie\\Desktop\\ME\\BD\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj",
         "projectName": "REST API HOSPITAL",
-        "projectPath": "C:\\Users\\javie\\Desktop\\ME\\hospital\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj",
+        "projectPath": "C:\\Users\\javie\\Desktop\\ME\\BD\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\REST API HOSPITAL.csproj",
         "packagesPath": "C:\\Users\\javie\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\javie\\Desktop\\ME\\hospital\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\obj\\",
+        "outputPath": "C:\\Users\\javie\\Desktop\\ME\\BD\\Hospital\\hospital-back\\REST API HOSPITAL\\REST API HOSPITAL\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
