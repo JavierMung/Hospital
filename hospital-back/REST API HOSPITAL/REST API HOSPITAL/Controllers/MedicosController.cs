@@ -29,13 +29,13 @@ namespace REST_API_HOSPITAL.Controllers
 				var res = await _medicosServices.GetMedico(id);
 				if (res == null)
 				{
-					return StatusCode(StatusCodes.Status200OK, "No existen medicos con ese ID");
+					return StatusCode(StatusCodes.Status204NoContent, "No existen medicos con ese ID. intentelo con otro ID por favor");
 				}
 				return res;
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status501NotImplemented, "Intentelo mas tarde");
+				return StatusCode(StatusCodes.Status501NotImplemented, "Error en el servidor: "+ex.Message+"Intentelo mas tarde");
 			}
 		}
 	}
