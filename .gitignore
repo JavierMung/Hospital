@@ -3,9 +3,9 @@
 
 /hospital-front/node_modules
 /hospital-front/node_modules
-"/hospital-back/REST API HOSPITAL/REST API HOSPITAL/.vs"
-"/hospital-back/REST API HOSPITAL/REST API HOSPITAL/obj"
-"/hospital-back/REST API HOSPITAL/REST API HOSPITAL/bin"
+/hospital-back/REST_API_HOSPITAL/REST_API_HOSPITAL/.vs
+/hospital-back/REST_API_HOSPITAL/REST_API_HOSPITAL/obj
+/hospital-back/REST_API_HOSPITAL/REST_API_HOSPITAL/bin
 *.dll
 
 
