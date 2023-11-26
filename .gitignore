@@ -1,6 +1,6 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+
 /hospital-front/node_modules
 /hospital-front/node_modules
 /hospital-back/REST_API_HOSPITAL/REST_API_HOSPITAL/.vs
