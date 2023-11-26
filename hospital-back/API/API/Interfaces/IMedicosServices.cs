@@ -1,6 +1,6 @@
-﻿using REST_API_HOSPITAL.ViewModels;
+﻿using API.ViewModels;
 
-namespace REST_API_HOSPITAL.Interfaces
+namespace API.Interfaces
 {
 	public interface IMedicosServices
 	{

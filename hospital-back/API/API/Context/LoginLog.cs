@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace REST_API_HOSPITAL.Context;
+namespace API.Context;
 
 public partial class LoginLog
 {

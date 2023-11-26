@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace REST_API_HOSPITAL.Context;
+namespace API.Context;
 
 public partial class HospitalContext : DbContext
 {

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using REST_API_HOSPITAL.Context;
-using REST_API_HOSPITAL.Interfaces;
-using REST_API_HOSPITAL.ViewModels;
+using API.Context;
+using API.Interfaces;
+using API.ViewModels;
 
-namespace REST_API_HOSPITAL.Services
+namespace API.Services
 {
 	public class MedicosServices : IMedicosServices
 	{

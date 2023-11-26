@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "REST_API_HOSPITAL": {
+    "API": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

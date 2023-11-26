@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using REST_API_HOSPITAL.Interfaces;
-using REST_API_HOSPITAL.ViewModels;
+using API.Interfaces;
+using API.ViewModels;
 
-namespace REST_API_HOSPITAL.Controllers
+namespace API.Controllers
 {
 
 	[Route("[controller]")]

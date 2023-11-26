@@ -1,6 +1,6 @@
-using REST_API_HOSPITAL.Context;
-using REST_API_HOSPITAL.Interfaces;
-using REST_API_HOSPITAL.Services;
+using API.Context;
+using API.Interfaces;
+using API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
