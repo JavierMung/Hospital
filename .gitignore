@@ -7,12 +7,13 @@
 /hospital-back/API/API/.vs
 /hospital-back/API/API/obj
 /hospital-back/API/API/bin
+/hospital-back/API/.vs
 .github
 .vs
 /.github
 /.vs
 *.dll
-
+*.bin
 
 .pnp.js
 
