@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\REST API HOSPITAL.props" />
-</Project>
