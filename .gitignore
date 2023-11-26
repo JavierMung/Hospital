@@ -7,6 +7,10 @@
 /hospital-back/API/API/.vs
 /hospital-back/API/API/obj
 /hospital-back/API/API/bin
+.github
+.vs
+/.github
+/.vs
 *.dll
 
 
