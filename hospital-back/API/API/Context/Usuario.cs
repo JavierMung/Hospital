@@ -17,5 +17,5 @@ public partial class Usuario
 
     public virtual Trabajador IdTrabajadorNavigation { get; set; } = null!;
 
-    public virtual ICollection<RecuperacionContrasena> RecuperacionContrasenas { get; } = new List<RecuperacionContrasena>();
+    public virtual ICollection<RecuperacionContrasena> RecuperacionContrasenas { get; set; } = new List<RecuperacionContrasena>();
 }

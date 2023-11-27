@@ -11,9 +11,9 @@ public partial class Servicio
 
     public double Costo { get; set; }
 
-    public virtual ICollection<Cita> Cita { get; } = new List<Cita>();
+    public virtual ICollection<Cita> Cita { get; set; } = new List<Cita>();
 
-    public virtual ICollection<ServiciosTicket> ServiciosTickets { get; } = new List<ServiciosTicket>();
+    public virtual ICollection<ServiciosTicket> ServiciosTickets { get; set; } = new List<ServiciosTicket>();
 
-    public virtual ICollection<TrabajadorServicio> TrabajadorServicios { get; } = new List<TrabajadorServicio>();
+    public virtual ICollection<TrabajadorServicio> TrabajadorServicios { get; set; } = new List<TrabajadorServicio>();
 }

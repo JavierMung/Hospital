@@ -9,5 +9,5 @@ public partial class TipoInsumo
 
     public string Tipo { get; set; } = null!;
 
-    public virtual ICollection<Insumo> Insumos { get; } = new List<Insumo>();
+    public virtual ICollection<Insumo> Insumos { get; set; } = new List<Insumo>();
 }

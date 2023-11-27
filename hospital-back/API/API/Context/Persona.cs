@@ -23,9 +23,9 @@ public partial class Persona
 
     public string Estado { get; set; } = null!;
 
-    public int Cp { get; set; }
+    public string Cp { get; set; } = null!;
 
-    public int? Telefono { get; set; }
+    public string Telefono { get; set; } = null!;
 
-    public virtual ICollection<Trabajador> Trabajadors { get; } = new List<Trabajador>();
+    public virtual ICollection<Trabajador> Trabajadors { get; set; } = new List<Trabajador>();
 }

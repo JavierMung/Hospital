@@ -15,7 +15,7 @@ public partial class Cita
 
     public DateTime Fecha { get; set; }
 
-    public virtual ICollection<Bitacora> Bitacoras { get; } = new List<Bitacora>();
+    public virtual ICollection<Bitacora> Bitacoras { get; set; } = new List<Bitacora>();
 
     public virtual Medico IdMedicoNavigation { get; set; } = null!;
 
@@ -23,5 +23,5 @@ public partial class Cita
 
     public virtual Servicio IdServicioNavigation { get; set; } = null!;
 
-    public virtual ICollection<RecetaMedica> RecetaMedicas { get; } = new List<RecetaMedica>();
+    public virtual ICollection<RecetaMedica> RecetaMedicas { get; set; } = new List<RecetaMedica>();
 }

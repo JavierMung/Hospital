@@ -17,13 +17,21 @@ namespace API.Services
 
 		public async Task<ViewMedicos?> GetMedico(int id)
 		{
-			var medico = await _context.Medicos
+			try
+			{
+				var medico = await _context.Medicos
 				.Include(m => m.IdTrabajadorNavigation)
+				.ThenInclude(t => t.IdPersonaNavigation)
 				.Where(m => m.IdMedico == id).FirstOrDefaultAsync();
 
-			if (medico == null) return null;
-			ViewMedicos respuesta = new(medico.IdMedico, medico.IdTrabajadorNavigation.IdPersonaNavigation.Nombre + " " + medico.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno + " " + medico.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoMaterno, medico.Especialidad);
-			return respuesta;
+				if (medico == null) return null;
+				ViewMedicos respuesta = new(medico.IdMedico, medico.IdTrabajadorNavigation.IdPersonaNavigation.Nombre + " " + medico.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno + " " + medico.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoMaterno, medico.Especialidad);
+				return respuesta;
+			}catch(Exception e) 
+			{ 
+				Console.WriteLine(e.ToString());
+				return null; 
+			}
 		}
 
 	}

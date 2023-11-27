@@ -17,7 +17,7 @@ public partial class Insumo
 
     public virtual TipoInsumo IdTipoInsumoNavigation { get; set; } = null!;
 
-    public virtual ICollection<RecetaMedicamento> RecetaMedicamentos { get; } = new List<RecetaMedicamento>();
+    public virtual ICollection<RecetaMedicamento> RecetaMedicamentos { get; set; } = new List<RecetaMedicamento>();
 
-    public virtual ICollection<TicketsInsumo> TicketsInsumos { get; } = new List<TicketsInsumo>();
+    public virtual ICollection<TicketsInsumo> TicketsInsumos { get; set; } = new List<TicketsInsumo>();
 }

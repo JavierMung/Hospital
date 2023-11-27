@@ -23,11 +23,11 @@ public partial class Trabajador
 
     public virtual Role IdRolNavigation { get; set; } = null!;
 
-    public virtual ICollection<Medico> Medicos { get; } = new List<Medico>();
+    public virtual ICollection<Medico> Medicos { get; set; } = new List<Medico>();
 
-    public virtual ICollection<Ticket> Tickets { get; } = new List<Ticket>();
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
-    public virtual ICollection<TrabajadorServicio> TrabajadorServicios { get; } = new List<TrabajadorServicio>();
+    public virtual ICollection<TrabajadorServicio> TrabajadorServicios { get; set; } = new List<TrabajadorServicio>();
 
-    public virtual ICollection<Usuario> Usuarios { get; } = new List<Usuario>();
+    public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
 }

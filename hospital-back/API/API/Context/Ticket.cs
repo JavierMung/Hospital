@@ -15,7 +15,7 @@ public partial class Ticket
 
     public virtual Trabajador IdTrabajadorNavigation { get; set; } = null!;
 
-    public virtual ICollection<ServiciosTicket> ServiciosTickets { get; } = new List<ServiciosTicket>();
+    public virtual ICollection<ServiciosTicket> ServiciosTickets { get; set; } = new List<ServiciosTicket>();
 
-    public virtual ICollection<TicketsInsumo> TicketsInsumos { get; } = new List<TicketsInsumo>();
+    public virtual ICollection<TicketsInsumo> TicketsInsumos { get; set; } = new List<TicketsInsumo>();
 }

@@ -13,5 +13,5 @@ public partial class Horario
 
     public DateTime HoraFin { get; set; }
 
-    public virtual ICollection<Trabajador> Trabajadors { get; } = new List<Trabajador>();
+    public virtual ICollection<Trabajador> Trabajadors { get; set; } = new List<Trabajador>();
 }
