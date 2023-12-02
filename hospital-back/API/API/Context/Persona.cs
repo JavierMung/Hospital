@@ -15,17 +15,17 @@ public partial class Persona
 
     public DateTime FechaNacimiento { get; set; }
 
-    public string Calle { get; set; } = null!;
+    public string? Calle { get; set; }
 
-    public string Colonia { get; set; } = null!;
+    public string? Colonia { get; set; }
 
-    public string Municipio { get; set; } = null!;
+    public string? Municipio { get; set; }
 
-    public string Estado { get; set; } = null!;
+    public string? Estado { get; set; }
 
-    public string Cp { get; set; } = null!;
+    public string? Cp { get; set; }
 
-    public string Telefono { get; set; } = null!;
+    public string? Telefono { get; set; }
 
     public virtual ICollection<Trabajador> Trabajadors { get; set; } = new List<Trabajador>();
 }

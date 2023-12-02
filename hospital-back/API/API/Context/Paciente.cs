@@ -11,7 +11,7 @@ public partial class Paciente
 
     public string ApellidoPaterno { get; set; } = null!;
 
-    public string ApellidoMaterno { get; set; } = null!;
+    public string? ApellidoMaterno { get; set; }
 
     public int Edad { get; set; }
 
