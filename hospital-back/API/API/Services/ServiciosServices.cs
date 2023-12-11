@@ -34,11 +34,75 @@ namespace API.Services
 			var consulta = await _context.Servicios.Where(ser => ser.IdServicio == idServicio).FirstOrDefaultAsync();
 			if (consulta == null) return null;
 			ViewServicio servicio = new ViewServicio(consulta.IdServicio, consulta.Servicio1, consulta.Costo);
-			return servicio;
+			return servicio;	
 		}
 
+        public async Task<int> DeleteServicio(int idServicio)
+        {
+            try
+            {
+                var servicio = await _context.Servicios.FindAsync(idServicio);
+                if (servicio == null)
+                {
+                    return 0;
+                }
+                _context.Servicios.Remove(servicio);
+                await _context.SaveChangesAsync();
+                return 1;
+            }
+            catch (Exception e)
+            {
+                return 2;
+            }
+        }
 
-		public async Task<List<ViewServicio?>?> GetServicios(string servicio)
+        public async Task<bool> AddServicio(string nombreServicio, double costo)
+        {
+            try
+            {
+                var nuevoServicio = new Servicio
+                {
+                    // Asumiendo que tienes propiedades como Nombre y Costo en tu entidad Servicio
+                    Servicio1 = nombreServicio,
+                    Costo = costo
+                };
+
+                _context.Servicios.Add(nuevoServicio);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                // Manejo de excepciones
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateServicio(int idServicio, string servicio1, double costo)
+        {
+            try
+            {
+                var servicio = await _context.Servicios.FindAsync(idServicio);
+                if (servicio == null)
+                {
+                    return false;
+                }
+
+                servicio.Servicio1 = servicio1;
+                servicio.Costo = costo;
+
+                _context.Servicios.Update(servicio);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                // Manejo de excepciones
+                return false;
+            }
+        }
+
+        public async Task<List<ViewServicio?>?> GetServicios(string servicio)
 		{
 			try
 			{
