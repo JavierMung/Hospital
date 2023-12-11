@@ -11,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IMedicosServices, MedicosServices>();
+builder.Services.AddScoped<ITrabajadoresServices, TrabajadoresServices>();
 builder.Services.AddScoped<IServiciosServices, ServiciosServices>();
 builder.Services.AddDbContext<HospitalContext>();
 
