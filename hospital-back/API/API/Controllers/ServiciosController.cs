@@ -73,14 +73,14 @@ namespace API.Controllers
         }
 
         [HttpPost("agregarServicio")]
-        public async Task<IActionResult> AddServicio([FromBody] ViewCreateServicio model)
+        public async Task<IActionResult> AddServicio([FromBody] ViewServicio model)
         {
             if (model == null)
             {
                 return BadRequest("Datos del servicio son inválidos.");
             }
 
-            var resultado = await _servicioServices.AddServicio(model.NombreServicio, model.Costo);
+            var resultado = await _servicioServices.AddServicio(model.servicio, model.costo);
 
             if (resultado)
             {
