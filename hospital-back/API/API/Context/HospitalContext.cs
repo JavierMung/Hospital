@@ -43,6 +43,8 @@ public partial class HospitalContext : DbContext
 
     public virtual DbSet<ServiciosTicket> ServiciosTickets { get; set; }
 
+    public virtual DbSet<Status> Statuses { get; set; }
+
     public virtual DbSet<Ticket> Tickets { get; set; }
 
     public virtual DbSet<TicketsInsumo> TicketsInsumos { get; set; }
@@ -95,6 +97,7 @@ public partial class HospitalContext : DbContext
             entity.Property(e => e.IdMedico).HasColumnName("Id_Medico");
             entity.Property(e => e.IdPaciente).HasColumnName("Id_Paciente");
             entity.Property(e => e.IdServicio).HasColumnName("Id_Servicio");
+            entity.Property(e => e.IdStatus).HasColumnName("Id_Status");
 
             entity.HasOne(d => d.IdMedicoNavigation).WithMany(p => p.Cita)
                 .HasForeignKey(d => d.IdMedico)
@@ -110,6 +113,11 @@ public partial class HospitalContext : DbContext
                 .HasForeignKey(d => d.IdServicio)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Citas__Id_Servic__4A8310C6");
+
+            entity.HasOne(d => d.IdStatusNavigation).WithMany(p => p.Cita)
+                .HasForeignKey(d => d.IdStatus)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Citas_Id_Status");
         });
 
         modelBuilder.Entity<Horario>(entity =>
@@ -328,6 +336,19 @@ public partial class HospitalContext : DbContext
                 .HasForeignKey(d => d.IdTicket)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Servicios__Id_Ti__367C1819");
+        });
+
+        modelBuilder.Entity<Status>(entity =>
+        {
+            entity.HasKey(e => e.IdStatus);
+
+            entity.ToTable("Status");
+
+            entity.Property(e => e.IdStatus).HasColumnName("Id_Status");
+            entity.Property(e => e.Status1)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Status");
         });
 
         modelBuilder.Entity<Ticket>(entity =>

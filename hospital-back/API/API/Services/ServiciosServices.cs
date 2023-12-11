@@ -15,6 +15,7 @@ namespace API.Services
 
 		public async Task<List<ViewServicio>?> GetAllServicios()
 		{
+			//LINQ
 			var consulta = await _context.Servicios
 							.ToListAsync();
 
