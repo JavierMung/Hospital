@@ -7,8 +7,8 @@ namespace API.Interfaces
 		public Task<ViewServicio?> GetServicio(int idServicio);
 		public Task<List<ViewServicio>?> GetAllServicios();
         public Task<int> DeleteServicio(int idServicio);
-        Task<bool> AddServicio(string nombreServicio, double costo);
-        Task<bool> UpdateServicio(int idServicio, string servicio, double costo);
+        public Task<ViewServicio?> AddServicio(ViewServicio model);
+        public Task<ViewServicio?> UpdateServicio(ViewServicio model);
 
 
     }

@@ -1,4 +1,5 @@
-﻿using API.Interfaces;
+﻿using API.Context;
+using API.Interfaces;
 using API.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -73,43 +74,40 @@ namespace API.Controllers
         }
 
         [HttpPost("agregarServicio")]
-        public async Task<IActionResult> AddServicio([FromBody] ViewServicio model)
+        public async Task<ActionResult<ViewServicio>> AddServicio([FromBody] ViewServicio model)
         {
-            if (model == null)
+            try
             {
-                return BadRequest("Datos del servicio son inválidos.");
-            }
+                var respuesta = await _servicioServices.AddServicio(model);
+                if (respuesta == null)
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, "Error al crear el servicio, revise los datos por favor");
+                }
 
-            var resultado = await _servicioServices.AddServicio(model.servicio, model.costo);
-
-            if (resultado)
-            {
-                return Ok("Servicio agregado con éxito.");
+                return respuesta;
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al agregar el servicio.");
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.ToString());
             }
         }
 
         [HttpPut("actualizarServicio")]
-        public async Task<IActionResult> UpdateServicio([FromBody] ViewServicio model)
+        public async Task<ActionResult<ViewServicio>> UpdateServicio([FromBody] ViewServicio model)
         {
             if (model == null)
             {
                 return BadRequest("Datos de actualización inválidos.");
             }
 
-            var resultado = await _servicioServices.UpdateServicio(model.idServicio, model.servicio, model.costo);
+            var resultado = await _servicioServices.UpdateServicio(model);
 
-            if (resultado)
+            if (resultado == null)
             {
-                return Ok("Servicio actualizado con éxito.");
+                return StatusCode(StatusCodes.Status404NotFound, "Error al crear el servicio, revise los datos por favor");
             }
-            else
-            {
-                return NotFound("Servicio no encontrado.");
-            }
+
+            return resultado;
         }
 
 
