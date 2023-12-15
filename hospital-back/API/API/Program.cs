@@ -13,6 +13,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IMedicosServices, MedicosServices>();
 builder.Services.AddScoped<ITrabajadoresServices, TrabajadoresServices>();
 builder.Services.AddScoped<IServiciosServices, ServiciosServices>();
+builder.Services.AddScoped<ICitasServices, CitasServices>();
 builder.Services.AddDbContext<HospitalContext>();
 
 
@@ -32,3 +33,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+/*
+ 
+ */
