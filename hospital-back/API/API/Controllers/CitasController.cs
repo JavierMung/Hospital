@@ -54,13 +54,13 @@ namespace API.Controllers
 			}
 		}
 
-		[HttpGet("obtenerCitasByCitaId/{id}")]
+		[HttpGet("obtenerCitasByMedicoName")]
 
-		public async Task<ActionResult<ViewCita?>> GetCitaById(int id)
+		public async Task<ActionResult<List<ViewCita?>?>> GetCitaById(ViewCita citaP)
 		{
 			try
 			{
-				var cita = await _citas.GetCitaById(id);
+				var cita = await _citas.GetCitasByName(citaP);
 
 				if (cita == null)
 				{
@@ -73,5 +73,26 @@ namespace API.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, ex.ToString());
 			}
 		}
+
+		[HttpPatch("updateCita")]
+
+		public async Task<ActionResult<ViewCita?>> UpdateCita(ViewCita citaP)
+		{
+			try
+			{
+				var cita = await _citas.UpdateCita(citaP);
+
+				if (cita == null)
+				{
+					return StatusCode(StatusCodes.Status404NotFound, "Error al actualizar la cita, revise los datos por favor");
+				}
+				return cita;
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, ex.ToString());
+			}
+		}
+
 	}
 }
