@@ -9,10 +9,10 @@ namespace API.Interfaces
 
         public Task<ViewListTrabajadores?> GetTrabajadores();
 
-        public Task<int> DeleteTrabajador(int id_Trabajador);
+        Task<Result<ViewTrabajador>> DeleteTrabajador(int idTrabajador);
 
-        public Task<int> AddTrabajador(int id_Rol, int id_Horario, int id_Persona, DateTime Fecha_Inicio, double Salario);
+        Task<Result<ViewTrabajador>> AddTrabajador(ViewAddTrabajador trabajadorRequest);
 
-        Task<bool> UpdateTrabajador(int id_trabajador,int id_Rol, int id_Horario, int id_Persona, DateTime Fecha_Inicio, double Salario);
+        Task<Result<ViewTrabajador>> UpdateTrabajador(int id_trabajador, ViewTrabajador trabajador);
     }
 }

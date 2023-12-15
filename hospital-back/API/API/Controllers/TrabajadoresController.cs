@@ -60,47 +60,39 @@ namespace API.Controllers
             {
                 var resultado = await _trabajadorServices.DeleteTrabajador(id);
 
-                switch (resultado)
+                if (resultado.Model != null)
                 {
-                    case 0:
-                        return NotFound("Trabajador no encontrado.");
-                    case 1:
-                        return Ok("Trabajador eliminado con éxito.");
-                    case 2:
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Error al eliminar el Trabajador.");
-                    case 3:
-                        return Conflict("No se puede eliminar el Trabajador debido a las dependencias existentes.");
-                    default:
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Error inesperado.");
+                    return Ok(resultado);
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, resultado.Message);
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Intentelo más tarde.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Inténtelo más tarde.");
             }
         }
 
-        [HttpPost("agregarTrabajador")]
-        public async Task<IActionResult> AddTrabajador([FromBody] ViewTrabajador model)
+
+        [HttpPost("agregar")]
+        public async Task<IActionResult> AddTrabajador([FromBody] ViewAddTrabajador trabajadorRequest)
         {
-            if (model == null)
+            var resultado = await _trabajadorServices.AddTrabajador(trabajadorRequest);
+
+            if (resultado.Model != null)
             {
-                return BadRequest("Datos del trabajador son inválidos.");
+                return Ok(resultado);
             }
-
-            var resultado = await _trabajadorServices.AddTrabajador(model.idRol, model.IdHorario, model.IdPersona, model.FechaInicio, model.Salario);
-
-            switch (resultado)
+            else
             {
-                case 1:
-                    return Ok("Trabajador agregado con éxito.");
-                case -1:
-                    return BadRequest("El ID de la persona proporcionado no existe.");
-                case 0:
-                default:
-                    return StatusCode(StatusCodes.Status500InternalServerError, "Error al agregar el trabajador, verificar los datos.");
+                return StatusCode(StatusCodes.Status500InternalServerError, resultado.Message);
             }
         }
+
+
+
 
         [HttpPut("actualizarTrabajador/{id}")]
         public async Task<IActionResult> UpdateTrabajador(int id, [FromBody] ViewTrabajador model)
@@ -110,20 +102,21 @@ namespace API.Controllers
                 return BadRequest("Datos del trabajador son inválidos.");
             }
 
-            var resultado = await _trabajadorServices.UpdateTrabajador(model.idTrabajador, model.idRol, model.IdHorario, model.IdPersona, model.FechaInicio, model.Salario);
+            var resultado = await _trabajadorServices.UpdateTrabajador(id, model);
 
-            if (resultado)
+            if (resultado.Model != null)
             {
-                return Ok("Trabajador actualizado con éxito.");
+                return Ok(resultado);
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al actualizar el trabajador.");
+                return StatusCode(StatusCodes.Status500InternalServerError, resultado.Message);
             }
         }
 
 
 
 
-    }    
+
+    }
 }
