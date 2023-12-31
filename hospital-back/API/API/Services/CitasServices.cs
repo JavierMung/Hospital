@@ -12,25 +12,66 @@ namespace API.Services
 		{
 			_context = context;
 		}
-		public async Task<ViewCita?> CreateCita(ViewCita cita)
+		public async Task<Result<ViewCita>> CreateCita(ViewCitaAdd cita)
 		{
+
+			var servicioMedicos = new MedicosServices(_context);
+
+			var medico = await servicioMedicos.GetMedico(cita.medico.idMedico);
+
+			if (medico.Model == null)
+			{
+				return new Result<ViewCita> { Model = null, Message = medico.Message, Status = medico.Status };
+
+			}
+
+			if (cita.FechaCita.Hour < medico.Model.HorarInicio.Hours || cita.FechaCita.Hour >= medico.Model.HoraFin.Hours)
+			{
+				return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
+			}
+
+
+			var citas = await GetCitasByMedicoId(cita.medico.idMedico);
+
+			if (citas.Model != null)
+			{
+
+				foreach (var cta in citas.Model)
+				{
+					if (cta.FechaCita.Date == cita.FechaCita.Date && cta.FechaCita.Hour == cita.FechaCita.Hour)
+					{
+						return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
+					}
+				}
+			}
+
 			using var transaction = _context.Database.BeginTransaction();
-			
+
 			try
 			{
 
 				PacientesServices spacientes = new(_context);
 				var paciente = await spacientes.CreatePaciente(cita.paciente);
 
-				if (paciente == null) return null;
+				if (paciente.Model == null)
+				{
+					return new Result<ViewCita>
+					{
+						Model = null,
+						Message = paciente.Message,
+						Status = paciente.Status
 
+					};
+				}
+
+				DateTime nuevaFechaHora = new DateTime(cita.FechaCita.Year, cita.FechaCita.Month, cita.FechaCita.Day, cita.FechaCita.Hour, 0, 0);
 
 				Cita citaInsert = new()
 				{
 					IdMedico = cita.medico.idMedico,
-					IdPaciente = paciente.Id,
+					IdPaciente = paciente.Model.Id,
 					IdServicio = cita.idServicio,
-					Fecha = cita.FechaCita,
+					Fecha = nuevaFechaHora,
 					IdStatus = 1
 				};
 
@@ -39,31 +80,52 @@ namespace API.Services
 
 				var citaIdCitaCreada = await _context.Citas.OrderByDescending(p => p.IdCita).FirstOrDefaultAsync();
 
-				if (citaIdCitaCreada == null) return null;
+				if (citaIdCitaCreada == null)
+				{
+					throw new Exception();
+				}
+
 
 				var id = citaIdCitaCreada.IdCita;
 
 				var respuesta = await GetCitaById(id);
 
-				if (respuesta == null) return null;
+				if (respuesta == null)
+				{
+					throw new Exception();
+				}
+
 
 				await transaction.CommitAsync();
 
-				return respuesta;
+				return new Result<ViewCita>
+				{
+					Model = respuesta.Model,
+					Message = "Cita creada con exito.",
+					Status = 200
+
+				}; ;
 			}
 			catch (Exception ex)
 			{
 				await transaction.RollbackAsync();
-				throw new Exception("Error al crear la cita: " + ex.Message.ToString()); ;
+				return new Result<ViewCita>
+				{
+					Model = null,
+					Message = "Error al crear la cita.",
+					Status = 500
+
+				};
 			}
 		}
 
-		public Task<ViewCita?> DeleteCita(int id)
+		public Task<Result<ViewCita>> DeleteCita(int id)
 		{
 			throw new NotImplementedException();
 		}
 
-		public async Task<ViewCita?> GetCitaById(int id)
+
+		public async Task<Result<ViewCita>> GetCitaById(int id)
 		{
 			try
 			{
@@ -73,13 +135,23 @@ namespace API.Services
 					.Include(c => c.IdMedicoNavigation)
 					.ThenInclude(p => p.IdTrabajadorNavigation)
 					.ThenInclude(t => t.IdPersonaNavigation)
+					.Include(c => c.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation)
 					.Include(t => t.IdStatusNavigation)
+					.Include(c => c.IdServicioNavigation)
 					.Include(c => c.IdServicioNavigation)
 
 					.Where(p => p.IdCita == id)
 					.FirstOrDefaultAsync();
 
-				if (cita == null) return null;
+				if (cita == null)
+				{
+					return new Result<ViewCita>
+					{
+						Model = null,
+						Message = "No se pudo recuperar la cita, verifique ID o busque por CURP del paciente.",
+						Status = 204
+					};
+				};
 
 				ViewCita citaRespuesta = new(
 					id: cita.IdCita,
@@ -94,7 +166,8 @@ namespace API.Services
 						Nombre: cita.IdPacienteNavigation.Nombre,
 						Apellido_Materno: cita.IdPacienteNavigation.ApellidoMaterno,
 						Apellido_Paterno: cita.IdPacienteNavigation.ApellidoPaterno,
-						Edad: cita.IdPacienteNavigation.Edad
+						Edad: cita.IdPacienteNavigation.Edad,
+						CURP: cita.IdPacienteNavigation.Curp
 					),
 					medico: new ViewMedicos
 					(
@@ -102,20 +175,36 @@ namespace API.Services
 						Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
 						+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
 						+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
-						Especialidad: cita.IdMedicoNavigation.Especialidad
+						Especialidad: cita.IdMedicoNavigation.Especialidad,
+						Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+							Status: cita.IdMedicoNavigation.Status ?? "",
+						cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
+						cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 					)
 
 				);
-				return citaRespuesta;
+				return new Result<ViewCita>
+				{
+					Model = citaRespuesta,
+					Message = "Cita recuperada con exito",
+					Status = 200
+
+				};
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Error al recuperark la cita: " + ex.Message.ToString()); ;
+				return new Result<ViewCita>
+				{
+					Model = null,
+					Message = "Error al recuperar la cita.",
+					Status = 500
+
+				};
 			}
 		}
 
 
-		public async Task<List<ViewCita?>?> GetCitasByMedicoId(int Id)
+		public async Task<Result<List<ViewCita>>> GetCitasByMedicoId(int Id)
 		{
 			try
 			{
@@ -126,11 +215,21 @@ namespace API.Services
 						.ThenInclude(t => t.IdPersonaNavigation)
 					.Include(c => c.IdStatusNavigation)
 					.Include(c => c.IdServicioNavigation)
+					.Include(c => c.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation)
 					.Where(p => p.IdMedico == Id)
 					.ToListAsync();
 
 
-				if (listaCita == null) return null;
+				if (listaCita == null || listaCita.Count <= 0)
+				{
+					return new Result<List<ViewCita>>
+					{
+						Model = null,
+						Message = $"No exiten citas para el medico con ID : {Id}.",
+						Status = 204
+
+					};
+				};
 
 				List<ViewCita?> listaDeCitasRespuesta = new();
 
@@ -150,7 +249,8 @@ namespace API.Services
 							Nombre: cita.IdPacienteNavigation.Nombre,
 							Apellido_Materno: cita.IdPacienteNavigation.ApellidoMaterno,
 							Apellido_Paterno: cita.IdPacienteNavigation.ApellidoPaterno,
-							Edad: cita.IdPacienteNavigation.Edad
+							Edad: cita.IdPacienteNavigation.Edad,
+							CURP: cita.IdPacienteNavigation.Curp
 						),
 						medico: new ViewMedicos
 						(
@@ -158,23 +258,40 @@ namespace API.Services
 							Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
-							Especialidad: cita.IdMedicoNavigation.Especialidad
+							Especialidad: cita.IdMedicoNavigation.Especialidad,
+							Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+							Status: cita.IdMedicoNavigation.Status ?? "",
+							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
+							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 						)
 
 					);
 
 					listaDeCitasRespuesta.Add(citaRespuesta);
 				}
-				return listaDeCitasRespuesta;
+				return new Result<List<ViewCita>>
+				{
+					Model = listaDeCitasRespuesta,
+					Message = "Citas recuperada con exito",
+					Status = 200
+
+				};
 
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Error al recuperar las citas: " + ex.Message.ToString());
+				return new Result<List<ViewCita>>
+				{
+					Model = null,
+					Message = "Error al recuperar las citas.",
+					Status = 500
+
+				};
+
 			}
 		}
 
-		public async Task<List<ViewCita?>?> GetCitasByName(ViewCita citaP)
+		public async Task<Result<List<ViewCita>>> GetCitasByCURP(string CURP)
 		{
 			try
 			{
@@ -185,12 +302,21 @@ namespace API.Services
 						.ThenInclude(t => t.IdPersonaNavigation)
 					.Include(c => c.IdStatusNavigation)
 					.Include(c => c.IdServicioNavigation)
-					.Where(c => (c.IdPacienteNavigation.Nombre + c.IdPacienteNavigation.ApellidoPaterno + c.IdPacienteNavigation.ApellidoMaterno) == (citaP.paciente.Nombre + citaP.paciente.Apellido_Paterno + citaP.paciente.Apellido_Paterno))
+					.Include(c => c.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation)
+					.Where(c => c.IdPacienteNavigation.Curp == CURP)
 					.ToListAsync();
 
 
-				if (listaCita == null) return null;
+				if (listaCita == null || listaCita.Count <= 0)
+				{
+					return new Result<List<ViewCita>>
+					{
+						Model = null,
+						Message = $"No exiten citas para el medico para el paciente con CURP : {CURP}.",
+						Status = 204
 
+					};
+				};
 				List<ViewCita?> listaDeCitasRespuesta = new();
 
 				foreach (var cita in listaCita)
@@ -209,7 +335,9 @@ namespace API.Services
 							Nombre: cita.IdPacienteNavigation.Nombre,
 							Apellido_Materno: cita.IdPacienteNavigation.ApellidoMaterno,
 							Apellido_Paterno: cita.IdPacienteNavigation.ApellidoPaterno,
-							Edad: cita.IdPacienteNavigation.Edad
+							Edad: cita.IdPacienteNavigation.Edad,
+							CURP: cita.IdPacienteNavigation.Curp
+
 						),
 						medico: new ViewMedicos
 						(
@@ -217,29 +345,47 @@ namespace API.Services
 							Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
-							Especialidad: cita.IdMedicoNavigation.Especialidad
+							Especialidad: cita.IdMedicoNavigation.Especialidad,
+							Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+							Status: cita.IdMedicoNavigation.Status ?? "",
+							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
+							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 						)
 
 					);
 
 					listaDeCitasRespuesta.Add(citaRespuesta);
 				}
-				return listaDeCitasRespuesta;
+
+				return new Result<List<ViewCita>>
+				{
+					Model = listaDeCitasRespuesta,
+					Message = "Citas recuperadas con exito",
+					Status = 200
+
+				};
 
 			}
 			catch (Exception ex)
 			{
-				throw new Exception("Error al recuperar las citas: " + ex.Message.ToString());
+				return new Result<List<ViewCita>>
+				{
+					Model = null,
+					Message = "Error al recuperar las citas.",
+					Status = 500
+
+				}; ;
 			}
 
 		}
 
-		public async Task<ViewCita?> UpdateCita(ViewCita cita)
+		public async Task<Result<ViewCita>> UpdateCita(ViewCitaAdd cita)
 		{
 			using var transaction = _context.Database.BeginTransaction();
 
 			try
 			{
+
 				var citaParaActualizar = await _context.Citas
 						.Include(c => c.IdPacienteNavigation)
 						.Include(c => c.IdMedicoNavigation)
@@ -252,13 +398,24 @@ namespace API.Services
 						.FirstOrDefaultAsync();
 
 
-				if (citaParaActualizar == null) return null;
+				if (citaParaActualizar == null)
+				{
+					return new Result<ViewCita>
+					{
+						Model = null,
+						Message = "No existe cita con ese ID.",
+						Status = 204
+
+					};
+				}
 
 				citaParaActualizar.IdPacienteNavigation.Edad = cita.paciente.Edad;
 				citaParaActualizar.IdPacienteNavigation.Nombre = cita.paciente.Nombre;
 				citaParaActualizar.IdPacienteNavigation.ApellidoPaterno = cita.paciente.Apellido_Paterno;
 				citaParaActualizar.IdPacienteNavigation.ApellidoMaterno = cita.paciente.Apellido_Materno ?? "";
-				citaParaActualizar.Fecha = cita.FechaCita;
+				DateTime nuevaFechaHora = new DateTime(cita.FechaCita.Year, cita.FechaCita.Month, cita.FechaCita.Day, cita.FechaCita.Hour, 0, 0);
+
+				citaParaActualizar.Fecha = nuevaFechaHora;
 
 				citaParaActualizar.IdStatus = cita.Status switch
 				{
@@ -270,20 +427,45 @@ namespace API.Services
 					_ => throw new Exception("Error al actualizar es Status"),
 				};
 
+				await _context.SaveChangesAsync();
+
 				var respuesta = await GetCitaById(cita.id);
 				await transaction.CommitAsync();
 
-				return respuesta;
+				return new Result<ViewCita>
+				{
+					Model = respuesta.Model,
+					Message = "Cita actualizada con exito",
+					Status = 200
+
+				}; ;
 
 			}
 			catch (Exception ex)
 			{
 				await transaction.RollbackAsync();
 				_context.ChangeTracker.Clear();
-				throw new Exception("Error al actualizar la cita: " + ex.Message.ToString());
 
+				return new Result<ViewCita>
+				{
+					Model = null,
+					Message = "Error al actualizar la cita",
+					Status = 505
+
+				};
 			}
 
 		}
+
+		/*private async List<DateTime> HorariosDisponibles()
+		{
+			var list = new List<DateTime>();
+
+			var servicioMedicos = new MedicosServices(_context);
+
+			//await servicioMedicos.GetMedicoDisponibilidad();
+
+			return list;
+		}*/
 	}
 }

@@ -12,7 +12,7 @@ namespace API.Services
 		{
 			_context = context;
 		}
-		public async Task<ViewPaciente?> CreatePaciente(ViewPaciente paciente)
+		public async Task<Result<ViewPaciente>> CreatePaciente(ViewPaciente paciente)
 		{
 
 			try
@@ -22,7 +22,7 @@ namespace API.Services
 				paciente1.ApellidoPaterno = paciente.Apellido_Paterno;
 				paciente1.Nombre = paciente.Nombre;
 				paciente1.Edad = paciente.Edad;
-
+				paciente1.Curp = paciente.CURP;
 				await _context.Pacientes.AddAsync(paciente1);
 				await _context.SaveChangesAsync();
 
@@ -31,7 +31,13 @@ namespace API.Services
 
 				if (pas == null || pas.IdPaciente <= 0)
 				{
-					return null;
+					return new Result<ViewPaciente>
+					{
+						Model = null,
+						Message = "Error al crear el paciente",
+						Status = StatusCodes.Status500InternalServerError
+
+					};
 				}
 
 				ViewPaciente res = new ViewPaciente(
@@ -39,35 +45,47 @@ namespace API.Services
 					Nombre: pas.Nombre,
 					Apellido_Materno: pas.ApellidoMaterno,
 					Apellido_Paterno: pas.ApellidoPaterno,
-					Edad: pas.Edad
+					Edad: pas.Edad,
+					CURP:pas.Curp
 				);
 
-				return res;
+				 return new Result<ViewPaciente>
+				{
+					Model = res,
+					Message = "Paciente creado con exito",
+					Status = StatusCodes.Status200OK
+
+				};
 			}
 			catch (Exception ex)
 			{
+				return new Result<ViewPaciente>
+				{
+					Model = null,
+					Message = "Error al crear el paciente",
+					Status = StatusCodes.Status500InternalServerError
 
-				throw new Exception("Error en la creacion del Paciente: " + ex.Message.ToString());
+				};
 			}
 
 		}
 
-		public Task<ViewPaciente?> DeletePaciente(int id)
+		public Task<Result<ViewPaciente>> DeletePaciente(int id)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<ViewPaciente?> GetPacienteById(int id)
+		public Task<Result<ViewPaciente>> GetPacienteById(int id)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<List<ViewPaciente?>?> GetPacientes()
+		public Task<Result<List<ViewPaciente>>> GetPacientes()
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<ViewPaciente?> UpdateCita(ViewPaciente paciente)
+		public Task<Result<ViewPaciente>> UpdateCita(ViewPaciente paciente)
 		{
 			throw new NotImplementedException();
 		}

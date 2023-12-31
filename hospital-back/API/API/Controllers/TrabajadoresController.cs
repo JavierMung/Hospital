@@ -6,117 +6,102 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("[controller]")]
-    [ApiController]
-    public class TrabajadoresController : ControllerBase
-    {
-        private readonly ITrabajadoresServices _trabajadorServices;
-        private readonly IConfiguration _configuration;
+	[Route("[controller]")]
+	[ApiController]
+	public class TrabajadoresController : ControllerBase
+	{
+		private readonly ITrabajadoresServices _trabajadorServices;
+		//	private readonly IConfiguration _configuration;
 
-        public TrabajadoresController(ITrabajadoresServices TrabajadoresServices, IConfiguration configuration)
-        {
-            _trabajadorServices = TrabajadoresServices;
-        }
-        [HttpGet("obtenerTrabajador/{id}")]
-        public async Task<ActionResult<ViewTrabajadores>> GetTrabajador(int id)
-        {
-            try
-            {
-                var res = await _trabajadorServices.GetTrabajador(id);
-                if (res == null) return StatusCode(StatusCodes.Status204NoContent, "No se encontraron Trabajadores con ese ID.");
-                return res;
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Intentelo más tarde. ");
-            }
+		public TrabajadoresController(ITrabajadoresServices TrabajadoresServices)
+		{
+			_trabajadorServices = TrabajadoresServices;
+		}
+		[HttpGet("obtenerTrabajador/{id}")]
+		public async Task<ActionResult<Result<ViewTrabajador>>> GetTrabajador(int id)
+		{
+			if (id <= 0)
+			{
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
+			}
 
-        }
+			return await ExecuteOperation(async () => await _trabajadorServices.GetTrabajador(id));
 
-        [HttpGet("obtenerTrabajadores")]
-        public async Task<ActionResult<ViewListTrabajadores>> GetTrabajadores()
-        {
-            //if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest, "El ID es incorrecto.");
+		}
 
-            try
-            {
-                var res = await _trabajadorServices.GetTrabajadores();
-                if (res == null)
-                {
-                    return StatusCode(StatusCodes.Status204NoContent, "No existen medicos con ese ID. intentelo con otro ID por favor.");
-                }
-                return res;
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status501NotImplemented, "Error en el servidor: " + ex.Message + ". Intentelo mas tarde.");
-            }
-        }
+		[HttpGet("obtenerTrabajadores")]
+		public async Task<ActionResult<Result<List<ViewTrabajador>>>> GetTrabajadores()
+		{
 
-        [HttpDelete("eliminarTrabajador/{id}")]
-        public async Task<IActionResult> DeleteTrabajador(int id)
-        {
-            try
-            {
-                var resultado = await _trabajadorServices.DeleteTrabajador(id);
+			return await ExecuteOperation(async () => await _trabajadorServices.GetTrabajadores());
 
-                if (resultado.Model != null)
-                {
-                    return Ok(resultado);
-                }
-                else
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError, resultado.Message);
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Inténtelo más tarde.");
-            }
-        }
+		}
 
+		[HttpDelete("eliminarTrabajador/{id}")]
+		public async Task<ActionResult<Result<ViewTrabajador>>> DeleteTrabajador(int id)
+		{
 
-        [HttpPost("agregar")]
-        public async Task<IActionResult> AddTrabajador([FromBody] ViewAddTrabajador trabajadorRequest)
-        {
-            var resultado = await _trabajadorServices.AddTrabajador(trabajadorRequest);
+			if (id <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
 
-            if (resultado.Model != null)
-            {
-                return Ok(resultado);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, resultado.Message);
-            }
-        }
+			return await ExecuteOperation(async () => await _trabajadorServices.DeleteTrabajador(id));
 
+		}
 
+		[HttpPost("agregarTrabajador")]
+		public async Task<ActionResult<Result<ViewTrabajador>>> AddTrabajador(ViewAddTrabajador trabajadorRequest)
+		{
 
+			return await ExecuteOperation(async () => await _trabajadorServices.AddTrabajador(trabajadorRequest));
 
-        [HttpPut("actualizarTrabajador/{id}")]
-        public async Task<IActionResult> UpdateTrabajador(int id, [FromBody] ViewTrabajador model)
-        {
-            if (model == null)
-            {
-                return BadRequest("Datos del trabajador son inválidos.");
-            }
+		}
 
-            var resultado = await _trabajadorServices.UpdateTrabajador(id, model);
+		[HttpPut("actualizarTrabajador")]
+		public async Task<ActionResult<Result<ViewTrabajador>>> UpdateTrabajador(ViewTrabajador model)
+		{
+			if (model.idTrabajador <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
 
-            if (resultado.Model != null)
-            {
-                return Ok(resultado);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, resultado.Message);
-            }
-        }
+			return await ExecuteOperation(async () => await _trabajadorServices.UpdateTrabajador(model));
 
+		}
+		public async Task<ActionResult<Result<T>>> ExecuteOperation<T>(Func<Task<Result<T>>> operation)
+		{
+			try
+			{
+				var result = await operation();
 
+				if (result.Status == 204)
+				{
+					return StatusCode(StatusCodes.Status204NoContent, result);
+				}
+				else if (result.Status == 500)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, result);
+				}
 
+				return StatusCode(StatusCodes.Status200OK, result);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, $"Error en el servidor: {ex.Message}. Inténtelo más tarde.");
+			}
+		}
 
-
-    }
+	}
 }

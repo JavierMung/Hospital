@@ -3,16 +3,16 @@ using System.Data;
 
 namespace API.Interfaces
 {
-    public interface ITrabajadoresServices
-    {
-        public Task<ViewTrabajadores?> GetTrabajador(int id_Trabajador);
+	public interface ITrabajadoresServices
+	{
+		public Task<Result<ViewTrabajador>> GetTrabajador(int id_Trabajador);
 
-        public Task<ViewListTrabajadores?> GetTrabajadores();
+		public Task<Result<List<ViewTrabajador>>> GetTrabajadores();
 
-        Task<Result<ViewTrabajador>> DeleteTrabajador(int idTrabajador);
+		public Task<Result<ViewTrabajador>> DeleteTrabajador(int idTrabajador);
 
-        Task<Result<ViewTrabajador>> AddTrabajador(ViewAddTrabajador trabajadorRequest);
+		public Task<Result<ViewTrabajador>> AddTrabajador(ViewAddTrabajador trabajadorRequest);
 
-        Task<Result<ViewTrabajador>> UpdateTrabajador(int id_trabajador, ViewTrabajador trabajador);
-    }
+		public Task<Result<ViewTrabajador>> UpdateTrabajador(ViewTrabajador trabajador);
+	}
 }

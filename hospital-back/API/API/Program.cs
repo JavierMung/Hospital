@@ -14,9 +14,15 @@ builder.Services.AddScoped<IMedicosServices, MedicosServices>();
 builder.Services.AddScoped<ITrabajadoresServices, TrabajadoresServices>();
 builder.Services.AddScoped<IServiciosServices, ServiciosServices>();
 builder.Services.AddScoped<ICitasServices, CitasServices>();
+builder.Services.AddScoped<IPersonaServices, PersonaServices>();
 builder.Services.AddDbContext<HospitalContext>();
 
-
+builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
+{
+	builder.AllowAnyOrigin()
+		   .AllowAnyMethod()
+		   .AllowAnyHeader();
+}));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace API.Context;
 
-public partial class Paciente
+public partial class HorariosMedico1
 {
-    public int IdPaciente { get; set; }
+    public int IdMedico { get; set; }
 
     public string Nombre { get; set; } = null!;
 
@@ -13,9 +13,9 @@ public partial class Paciente
 
     public string? ApellidoMaterno { get; set; }
 
-    public int Edad { get; set; }
+    public string Turno { get; set; } = null!;
 
-    public string Curp { get; set; } = null!;
+    public TimeSpan HoraInicio { get; set; }
 
-    public virtual ICollection<Cita> Cita { get; set; } = new List<Cita>();
+    public TimeSpan HoraFin { get; set; }
 }

@@ -21,11 +21,17 @@ public partial class HospitalContext : DbContext
 
     public virtual DbSet<Horario> Horarios { get; set; }
 
+    public virtual DbSet<HorariosMedico> HorariosMedicos { get; set; }
+
+    public virtual DbSet<HorariosMedico1> HorariosMedicos1 { get; set; }
+
     public virtual DbSet<Insumo> Insumos { get; set; }
 
     public virtual DbSet<LoginLog> LoginLogs { get; set; }
 
     public virtual DbSet<Medico> Medicos { get; set; }
+
+    public virtual DbSet<MedicosEspecialidad> MedicosEspecialidads { get; set; }
 
     public virtual DbSet<Paciente> Pacientes { get; set; }
 
@@ -55,9 +61,15 @@ public partial class HospitalContext : DbContext
 
     public virtual DbSet<Trabajador> Trabajadors { get; set; }
 
+    public virtual DbSet<TrabajadorRol> TrabajadorRols { get; set; }
+
     public virtual DbSet<TrabajadorServicio> TrabajadorServicios { get; set; }
 
+    public virtual DbSet<TrabajadorServicio1> TrabajadorServicios1 { get; set; }
+
     public virtual DbSet<Usuario> Usuarios { get; set; }
+
+    public virtual DbSet<VistaHorariosMedico> VistaHorariosMedicos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
@@ -125,8 +137,62 @@ public partial class HospitalContext : DbContext
             entity.HasKey(e => e.IdHorario).HasName("PK__Horarios__AD7A4DD399652B80");
 
             entity.Property(e => e.IdHorario).HasColumnName("Id_Horario");
+            entity.Property(e => e.HoraFin)
+                .HasPrecision(4)
+                .HasColumnName("Hora_Fin");
+            entity.Property(e => e.HoraInicio)
+                .HasPrecision(4)
+                .HasColumnName("Hora_Inicio");
+            entity.Property(e => e.Turno)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<HorariosMedico>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("Horarios_Medicos");
+
+            entity.Property(e => e.ApellidoMaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Materno");
+            entity.Property(e => e.ApellidoPaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Paterno");
             entity.Property(e => e.HoraFin).HasColumnName("Hora_Fin");
             entity.Property(e => e.HoraInicio).HasColumnName("Hora_Inicio");
+            entity.Property(e => e.IdMedico).HasColumnName("Id_Medico");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Turno)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<HorariosMedico1>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("HorariosMedicos");
+
+            entity.Property(e => e.ApellidoMaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Materno");
+            entity.Property(e => e.ApellidoPaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Paterno");
+            entity.Property(e => e.HoraFin).HasColumnName("Hora_Fin");
+            entity.Property(e => e.HoraInicio).HasColumnName("Hora_Inicio");
+            entity.Property(e => e.IdMedico).HasColumnName("Id_Medico");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Turno)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -164,6 +230,9 @@ public partial class HospitalContext : DbContext
             entity.HasKey(e => e.IdMedico).HasName("PK__Medicos__7BA5D810BD01BCCB");
 
             entity.Property(e => e.IdMedico).HasColumnName("Id_Medico");
+            entity.Property(e => e.Cedula)
+                .HasMaxLength(100)
+                .IsUnicode(false);
             entity.Property(e => e.Consultorio)
                 .HasMaxLength(10)
                 .IsUnicode(false);
@@ -171,11 +240,26 @@ public partial class HospitalContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.IdTrabajador).HasColumnName("Id_Trabajador");
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.IdTrabajadorNavigation).WithMany(p => p.Medicos)
                 .HasForeignKey(d => d.IdTrabajador)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Medicos__Id_Trab__29221CFB");
+        });
+
+        modelBuilder.Entity<MedicosEspecialidad>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("MedicosEspecialidad");
+
+            entity.Property(e => e.Especialidad)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.NumeroMedicos).HasColumnName("numero_medicos");
         });
 
         modelBuilder.Entity<Paciente>(entity =>
@@ -191,6 +275,10 @@ public partial class HospitalContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("Apellido_Paterno");
+            entity.Property(e => e.Curp)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("CURP");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(50)
                 .IsUnicode(false);
@@ -240,7 +328,11 @@ public partial class HospitalContext : DbContext
         {
             entity.HasKey(e => e.IdRecetaMedica).HasName("PK__Receta_M__009BD783EE49A668");
 
-            entity.ToTable("Receta_Medica");
+            entity.ToTable("Receta_Medica", tb =>
+                {
+                    tb.HasTrigger("ModificacionBitacoraReceta");
+                    tb.HasTrigger("RegistroBitacoraReceta");
+                });
 
             entity.Property(e => e.IdRecetaMedica).HasColumnName("Id_Receta_Medica");
             entity.Property(e => e.IdCita).HasColumnName("Id_Cita");
@@ -441,6 +533,28 @@ public partial class HospitalContext : DbContext
                 .HasConstraintName("FK__Trabajado__Id_Ro__14270015");
         });
 
+        modelBuilder.Entity<TrabajadorRol>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("TrabajadorRol");
+
+            entity.Property(e => e.ApellidoMaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Materno");
+            entity.Property(e => e.ApellidoPaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Paterno");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Rol)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<TrabajadorServicio>(entity =>
         {
             entity.HasKey(e => e.IdTrabajadorServicio).HasName("PK__Trabajad__07BD7BF310B743D2");
@@ -460,6 +574,28 @@ public partial class HospitalContext : DbContext
                 .HasForeignKey(d => d.IdTrabajador)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Trabajado__Id_Tr__2DE6D218");
+        });
+
+        modelBuilder.Entity<TrabajadorServicio1>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("TrabajadorServicio");
+
+            entity.Property(e => e.ApellidoMaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Materno");
+            entity.Property(e => e.ApellidoPaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Paterno");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Servicio)
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Usuario>(entity =>
@@ -485,6 +621,31 @@ public partial class HospitalContext : DbContext
                 .HasForeignKey(d => d.IdTrabajador)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Usuario__Id_Trab__1EA48E88");
+        });
+
+        modelBuilder.Entity<VistaHorariosMedico>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("Vista_Horarios_Medicos");
+
+            entity.Property(e => e.ApellidoMaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Materno");
+            entity.Property(e => e.ApellidoPaterno)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Apellido_Paterno");
+            entity.Property(e => e.HoraFin).HasColumnName("Hora_Fin");
+            entity.Property(e => e.HoraInicio).HasColumnName("Hora_Inicio");
+            entity.Property(e => e.IdMedico).HasColumnName("Id_Medico");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.Turno)
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         OnModelCreatingPartial(modelBuilder);

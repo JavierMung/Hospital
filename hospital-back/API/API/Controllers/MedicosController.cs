@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using API.Interfaces;
 using API.ViewModels;
+using API.Context;
 
 namespace API.Controllers
 {
@@ -21,44 +22,49 @@ namespace API.Controllers
 		}
 
 		[HttpGet("obtenerMedico/{id}")]
-		public async Task<ActionResult<ViewMedicos>> GetMedico(int id)
+		public async Task<ActionResult<Result<ViewMedicos>>> GetMedico(int id)
 		{
-			if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest, "El ID es incorrecto.");
-
-			try
-			{
-				var res = await _medicosServices.GetMedico(id);
-				if (res == null)
+			if (id <= 0)
+				return BadRequest(new Result<ViewTrabajador>
 				{
-					var mensajeStatus204 = _configuration.GetSection("MensajesDeEstatus:Status204:mensaje").Value ?? "xd";
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
 
-					return StatusCode(StatusCodes.Status204NoContent, mensajeStatus204);
-				}
-				return StatusCode(StatusCodes.Status200OK,res);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(StatusCodes.Status501NotImplemented, _configuration.GetSection("MensajesDeEstatus").GetValue("Status500", "Se ha producido un error interno en el servidor."));
-			}
+			return await ExecuteOperation(async () => await _medicosServices.GetMedico(id));
 		}
 
 		[HttpGet("obtenerMedicos")]
-		public async Task<ActionResult<ViewListMedicos>> GetMedicos()
+		public async Task<ActionResult<Result<ViewListMedicos>>> GetMedicos()
 		{
-			//if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest, "El ID es incorrecto.");
+			return await ExecuteOperation(async () => await _medicosServices.GetMedicos());
+		}
 
+		public async Task<ActionResult<Result<T>>> ExecuteOperation<T>(Func<Task<Result<T>>> operation)
+		{
 			try
 			{
-				var res = await _medicosServices.GetMedicos();
-				if (res == null)
+				var result = await operation();
+
+				if (result.Status == 204)
 				{
-					return StatusCode(StatusCodes.Status204NoContent, "No existen medicos con ese ID. intentelo con otro ID por favor.");
+					return StatusCode(StatusCodes.Status204NoContent, result);
 				}
-				return res;
+				else if (result.Status == 500)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, result);
+				}
+				else if (result.Status == 400)
+				{
+					return StatusCode(StatusCodes.Status400BadRequest, result);
+				}
+
+				return StatusCode(StatusCodes.Status200OK, result);
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status501NotImplemented, "Error en el servidor: " + ex.Message + ". Intentelo mas tarde.");
+				return StatusCode(StatusCodes.Status500InternalServerError, $"Error en el servidor: {ex.Message}. Inténtelo más tarde.");
 			}
 		}
 

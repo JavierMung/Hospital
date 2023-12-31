@@ -15,6 +15,10 @@ public partial class Medico
 
     public bool Consulta { get; set; }
 
+    public string? Cedula { get; set; }
+
+    public string? Status { get; set; }
+
     public virtual ICollection<Cita> Cita { get; set; } = new List<Cita>();
 
     public virtual Trabajador IdTrabajadorNavigation { get; set; } = null!;
