@@ -15,6 +15,8 @@ public partial class Usuario
 
     public string Email { get; set; } = null!;
 
+    public string Salt { get; set; } = null!;
+
     public virtual Trabajador IdTrabajadorNavigation { get; set; } = null!;
 
     public virtual ICollection<RecuperacionContrasena> RecuperacionContrasenas { get; set; } = new List<RecuperacionContrasena>();

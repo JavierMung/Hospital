@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using API.Context;
 using API.Interfaces;
 using API.ViewModels;
+using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace API.Services
 {
@@ -21,7 +23,7 @@ namespace API.Services
 		{
 			try
 			{
-				var medico = await _context.Medicos
+                 var medico = await _context.Medicos
 				.Include(m => m.IdTrabajadorNavigation)
 				.ThenInclude(t => t.IdPersonaNavigation)
 				.Include(m => m.IdTrabajadorNavigation.IdHorarioNavigation)
@@ -45,7 +47,7 @@ namespace API.Services
 
 				return new Result<ViewMedicos> { Model = respuesta, Message = "Medico encontrado con exito.", Status = StatusCodes.Status200OK };
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 
 				return new Result<ViewMedicos> { Model = null, Message = "Error al buscar el medico.", Status = StatusCodes.Status500InternalServerError };

@@ -606,12 +606,15 @@ public partial class HospitalContext : DbContext
 
             entity.Property(e => e.IdUsuario).HasColumnName("Id_usuario");
             entity.Property(e => e.Contraseña)
-                .HasMaxLength(25)
+                .HasMaxLength(256)
                 .IsUnicode(false);
             entity.Property(e => e.Email)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.IdTrabajador).HasColumnName("Id_Trabajador");
+            entity.Property(e => e.Salt)
+                .HasMaxLength(128)
+                .IsUnicode(false);
             entity.Property(e => e.Usuario1)
                 .HasMaxLength(25)
                 .IsUnicode(false)
