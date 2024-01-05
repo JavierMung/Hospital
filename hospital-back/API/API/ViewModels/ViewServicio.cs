@@ -2,6 +2,7 @@
 {
 	public record ViewServicio (int idServicio, string servicio, double costo );
 	public record ViewServicioAdd(string servicio, double costo);
-	public record ViewServicioTicket(string IdServicio, int Cantidad);
+	public record ViewServicioTicket(int IdServicio, int Cantidad);
+
 
 }
