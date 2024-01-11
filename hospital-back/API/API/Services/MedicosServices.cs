@@ -17,17 +17,20 @@ namespace API.Services
 			_context = context;
 		}
 
-
+		public Task<Result<ViewMedicoAdd>> AddMedico(ViewMedicoAdd medicosAdd)
+		{
+			throw new NotImplementedException();
+		}
 
 		public async Task<Result<ViewMedicos>> GetMedico(int id)
 		{
 			try
 			{
-                 var medico = await _context.Medicos
-				.Include(m => m.IdTrabajadorNavigation)
-				.ThenInclude(t => t.IdPersonaNavigation)
-				.Include(m => m.IdTrabajadorNavigation.IdHorarioNavigation)
-				.Where(m => m.IdMedico == id).FirstOrDefaultAsync();
+				var medico = await _context.Medicos
+			   .Include(m => m.IdTrabajadorNavigation)
+			   .ThenInclude(t => t.IdPersonaNavigation)
+			   .Include(m => m.IdTrabajadorNavigation.IdHorarioNavigation)
+			   .Where(m => m.IdMedico == id).FirstOrDefaultAsync();
 
 				if (medico == null)
 				{
@@ -36,10 +39,13 @@ namespace API.Services
 				}
 				ViewMedicos respuesta = new(
 					medico.IdMedico,
+					medico.IdTrabajador,
 					medico.IdTrabajadorNavigation.IdPersonaNavigation.Nombre + " " + medico.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno + " " + medico.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoMaterno,
 					medico.Especialidad,
 					medico.Consultorio ?? "",
+					medico.Consultorio ?? "",
 					medico.Status ?? "",
+					medico.Consulta,
 					medico.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
 					medico.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 					);
@@ -76,10 +82,13 @@ namespace API.Services
 				{
 					Medicos.Add(new ViewMedicos(
 						cons.IdMedico,
+						cons.IdTrabajador,
 						cons.IdTrabajadorNavigation.IdPersonaNavigation.Nombre + " " + cons.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno + " " + cons.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoMaterno,
 						cons.Especialidad,
 						cons.Consultorio ?? "",
+						cons.Cedula ?? "",
 						cons.Status ?? "",
+						cons.Consulta,
 						cons.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
 						cons.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 						));
@@ -95,27 +104,30 @@ namespace API.Services
 		}
 
 
-		public async Task<Result<ViewMedicosAdd>> UpdateMedico(ViewMedicosAdd medicoAdd)
+		public async Task<Result<ViewMedicos>> UpdateMedico(ViewMedicosUpdate medicoAdd)
 		{
 			try
 			{
-				var medico = await _context.Medicos.FindAsync(medicoAdd.idMedico);
+				var medico = await _context.Medicos.FindAsync(medicoAdd.IdMedico);
 
 				if (medico == null)
 				{
-					return new Result<ViewMedicosAdd> { Model = null, Message = "No existe medico con ese ID.", Status = StatusCodes.Status204NoContent };
+					return new Result<ViewMedicos> { Model = null, Message = "No existe medico con ese ID.", Status = StatusCodes.Status204NoContent };
 				}
 				medico.Consultorio = medicoAdd.Consultorio;
 				medico.Especialidad = medicoAdd.Especialidad;
 				medico.Status = medicoAdd.Status;
+				medico.Consulta = medicoAdd.Consulta;
 				_context.SaveChanges();
 
-				return new Result<ViewMedicosAdd> { Model = medicoAdd, Message = "Medico actualizado con exito.", Status = StatusCodes.Status200OK };
+				var med = await GetMedico(medicoAdd.IdMedico);
+
+				return new Result<ViewMedicos> { Model = med.Model, Message = "Medico actualizado con exito.", Status = StatusCodes.Status200OK };
 
 			}
 			catch (Exception)
 			{
-				return new Result<ViewMedicosAdd> { Model = null, Message = "Error al actualizar el medico.", Status = StatusCodes.Status500InternalServerError };
+				return new Result<ViewMedicos> { Model = null, Message = "Error al actualizar el medico.", Status = StatusCodes.Status500InternalServerError };
 
 			}
 		}

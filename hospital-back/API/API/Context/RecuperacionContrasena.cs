@@ -5,8 +5,7 @@ namespace API.Context;
 
 public partial class RecuperacionContrasena
 {
-
-	public int IdRecuperacionContrasena { get; set; }
+    public int IdRecuperacionContrasena { get; set; }
 
     public int IdUsuario { get; set; }
 

@@ -41,6 +41,17 @@ namespace API.Controllers
 			return await ExecuteOperation(async () => await _medicosServices.GetMedicos());
 		}
 
+		[HttpPut("actualizarMedico")]
+		public async Task<ActionResult<Result<ViewMedicos>>> UpdateMedico([FromBody] ViewMedicosUpdate medico)
+		{
+			return await ExecuteOperation(async () => await _medicosServices.UpdateMedico(medico));
+		}
+		[HttpPost("agregarMedico")]
+		public async Task<ActionResult<Result<ViewMedicoAdd>>> AddMedico([FromBody] ViewMedicoAdd medico)
+		{
+			return await ExecuteOperation(async () => await _medicosServices.AddMedico(medico));
+		}
+
 		public async Task<ActionResult<Result<T>>> ExecuteOperation<T>(Func<Task<Result<T>>> operation)
 		{
 			try

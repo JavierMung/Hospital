@@ -21,7 +21,7 @@ namespace API.Controllers
 
 		public async Task<ActionResult<Result<ViewCita>>> CrearCita(ViewCitaAdd cita)
 		{
-			if (cita.medico.idMedico <= 0)
+			if (cita.IdMedico <= 0)
 			{
 				return BadRequest(new Result<ViewCita> { Message = "El ID del medico es incorrecto.", Status = StatusCodes.Status400BadRequest });
 			}
@@ -79,7 +79,7 @@ namespace API.Controllers
 			return await ExecuteOperation(async () => await _citas.GetCitasByCURP(CURP.ToUpper()));
 		}
 
-		[HttpPost("actualizarCita")]
+		[HttpPut("actualizarCita")]
 
 		public async Task<ActionResult<Result<ViewCita>>> UpdateCita(ViewCitaAdd citaP)
 		{

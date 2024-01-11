@@ -55,20 +55,37 @@ namespace API.Controllers
 		[HttpPost("agregarServicio")]
 		public async Task<ActionResult<Result<ViewServicio>>> AddServicio([FromBody] ViewServicioAdd model)
 		{
-
+			if(model.costo <= 0)
+			{
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El costo no puede ser 0 o menor.",
+					Status = 400
+				});
+			}
 			return await ExecuteOperation(async () => await _servicioServices.AddServicio(model));
 		}
 
 		[HttpPut("actualizarServicio")]
 		public async Task<ActionResult<Result<ViewServicio>>> UpdateServicio([FromBody] ViewServicio model)
 		{
-			if (model.idServicio <= 0)
+			if (model.IdServicio <= 0)
 				return BadRequest(new Result<ViewTrabajador>
 				{
 					Model = null,
 					Message = "El ID es incorrecto.",
 					Status = 400
 				});
+			if (model.Costo <= 0)
+			{
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El costo no puede ser 0 o menor.",
+					Status = 400
+				});
+			}
 
 			return await ExecuteOperation(async () => await _servicioServices.UpdateServicio(model));
 		}

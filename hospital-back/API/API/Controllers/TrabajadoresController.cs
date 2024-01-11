@@ -1,9 +1,10 @@
-﻿using API.Interfaces;
+﻿using API.Helper;
+using API.Interfaces;
 using API.Services;
 using API.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
+using API.Helper;
 namespace API.Controllers
 {
 	[Route("[controller]")]
@@ -69,6 +70,7 @@ namespace API.Controllers
 		[HttpPut("actualizarTrabajador")]
 		public async Task<ActionResult<Result<ViewTrabajador>>> UpdateTrabajador(ViewTrabajador model)
 		{
+			//if(!Token.ValidateJwtToken("", "")) 
 			if (model.idTrabajador <= 0)
 				return BadRequest(new Result<ViewTrabajador>
 				{

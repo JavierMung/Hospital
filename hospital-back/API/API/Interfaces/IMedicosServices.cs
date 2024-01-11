@@ -7,7 +7,8 @@ namespace API.Interfaces
 	{
 		public Task<Result<ViewMedicos>> GetMedico(int id);
 		public Task<Result<ViewListMedicos>> GetMedicos();
-		public Task<Result<ViewMedicosAdd>> UpdateMedico(ViewMedicosAdd medicosAdd);
+		public Task<Result<ViewMedicos>> UpdateMedico(ViewMedicosUpdate medicosAdd);
+		public Task<Result<ViewMedicoAdd>> AddMedico(ViewMedicoAdd medicosAdd);
 	}
 }
 

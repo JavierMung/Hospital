@@ -10,7 +10,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Net;
 using System.Net.Mail;
-
+using API.Helper;
 namespace API.Services
 {
 	public class UserServices : IUserServices
@@ -39,10 +39,10 @@ namespace API.Services
 				}
 				if (resultado == "Contraseña válida")
 				{
-					var Token = GenerateJwtToken(user.Username, 90);
+					
 					return new Result<ViewUserToken>()
 					{
-						Model = new ViewUserToken(user.Username, Token),
+						Model = new ViewUserToken(user.Username, Token.GenerateJwtToken(user.Username, 90) ),
 						Message = "Usuario correcto.",
 						Status = StatusCodes.Status200OK
 					};
@@ -129,7 +129,7 @@ namespace API.Services
 			}
 
 			var tiempoEnMinutos = 5;
-			var token = GenerateJwtToken(usuario.Usuario1, tiempoEnMinutos);
+			var token = Token.GenerateJwtToken(usuario.Usuario1, tiempoEnMinutos);
 			var cuerpo = GenerateResetPasswordHtml(usuario.Usuario1, token);
 
 			var fechaExpiracion = DateTime.Now.AddMinutes(tiempoEnMinutos);
@@ -216,7 +216,7 @@ namespace API.Services
 		public async Task<Result<ViewUserToken>> ValidateToken(ViewUserToken token)
 		{
 
-			if (ValidateJwtToken(token.Token, token.Username))
+			if (Token.ValidateJwtToken(token.Token, token.Username))
 			{
 				return new Result<ViewUserToken>()
 				{
@@ -254,63 +254,6 @@ namespace API.Services
 					smtpCliente.EnableSsl = true;
 					smtpCliente.UseDefaultCredentials = false;
 					smtpCliente.Send(mensaje);
-				}
-
-				return true;
-			}
-			catch (Exception)
-			{
-				return false;
-			}
-		}
-		private static string GenerateJwtToken(string username, int Tiempo)
-		{
-
-			var key = Encoding.ASCII.GetBytes("HospitalProyESCOMJavierMung_2023");
-
-			var tiempo1 = DateTime.UtcNow;
-			var tiempo2 = DateTime.Now;
-
-			var tokenHandler = new JwtSecurityTokenHandler();
-			var tokenDescriptor = new SecurityTokenDescriptor
-			{
-				Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }),
-				NotBefore = DateTime.Now,
-				Expires = DateTime.Now.AddMinutes(Tiempo),
-				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-			};
-
-			var token = tokenHandler.CreateToken(tokenDescriptor);
-			return tokenHandler.WriteToken(token);
-		}
-		private static bool ValidateJwtToken(string token, string Username)
-		{
-			var key = Encoding.ASCII.GetBytes("HospitalProyESCOMJavierMung_2023");
-
-			var tokenHandler = new JwtSecurityTokenHandler();
-
-			var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-			var expiration = jwtToken?.ValidTo.ToLocalTime();
-
-
-			var validationParameters = new TokenValidationParameters
-			{
-				ValidateIssuerSigningKey = true,
-				IssuerSigningKey = new SymmetricSecurityKey(key),
-				ValidateIssuer = false,
-				ValidateAudience = false,
-				ValidateLifetime = true
-			};
-
-			try
-			{
-				SecurityToken securityToken;
-				var principal = tokenHandler.ValidateToken(token, validationParameters, out securityToken);
-
-				var usernameClaim = principal.FindFirst(ClaimTypes.Name)?.Value;
-				if (usernameClaim != Username)
-				{
-					return false;
 				}
 
 				return true;

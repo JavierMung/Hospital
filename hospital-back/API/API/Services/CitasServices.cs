@@ -17,7 +17,7 @@ namespace API.Services
 
 			var servicioMedicos = new MedicosServices(_context);
 
-			var medico = await servicioMedicos.GetMedico(cita.medico.idMedico);
+			var medico = await servicioMedicos.GetMedico(cita.IdMedico);
 
 			if (medico.Model == null)
 			{
@@ -31,7 +31,7 @@ namespace API.Services
 			}
 
 
-			var citas = await GetCitasByMedicoId(cita.medico.idMedico);
+			var citas = await GetCitasByMedicoId(cita.IdMedico);
 
 			if (citas.Model != null)
 			{
@@ -68,7 +68,7 @@ namespace API.Services
 
 				Cita citaInsert = new()
 				{
-					IdMedico = cita.medico.idMedico,
+					IdMedico = cita.IdMedico,
 					IdPaciente = paciente.Model.Id,
 					IdServicio = cita.idServicio,
 					Fecha = nuevaFechaHora,
@@ -78,17 +78,8 @@ namespace API.Services
 				await _context.Citas.AddAsync(citaInsert);
 				await _context.SaveChangesAsync();
 
-				var citaIdCitaCreada = await _context.Citas.OrderByDescending(p => p.IdCita).FirstOrDefaultAsync();
 
-				if (citaIdCitaCreada == null)
-				{
-					throw new Exception();
-				}
-
-
-				var id = citaIdCitaCreada.IdCita;
-
-				var respuesta = await GetCitaById(id);
+				var respuesta = await GetCitaById(citaInsert.IdCita);
 
 				if (respuesta == null)
 				{
@@ -171,15 +162,18 @@ namespace API.Services
 					),
 					medico: new ViewMedicos
 					(
-						idMedico: cita.IdMedicoNavigation.IdMedico,
-						Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
-						+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
-						+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
-						Especialidad: cita.IdMedicoNavigation.Especialidad,
-						Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+						IdMedico: cita.IdMedicoNavigation.IdMedico,
+							IdTrabajador: cita.IdMedicoNavigation.IdTrabajador,
+							Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
+							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
+							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
+							Especialidad: cita.IdMedicoNavigation.Especialidad,
+							Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+							Cedula: cita.IdMedicoNavigation.Cedula ?? "",
 							Status: cita.IdMedicoNavigation.Status ?? "",
-						cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
-						cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
+							Consulta: cita.IdMedicoNavigation.Consulta,
+							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
+							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 					)
 
 				);
@@ -254,13 +248,16 @@ namespace API.Services
 						),
 						medico: new ViewMedicos
 						(
-							idMedico: cita.IdMedicoNavigation.IdMedico,
+							IdMedico: cita.IdMedicoNavigation.IdMedico,
+							IdTrabajador: cita.IdMedicoNavigation.IdTrabajador,
 							Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
 							Especialidad: cita.IdMedicoNavigation.Especialidad,
 							Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+							Cedula: cita.IdMedicoNavigation.Cedula ?? "",
 							Status: cita.IdMedicoNavigation.Status ?? "",
+							Consulta: cita.IdMedicoNavigation.Consulta,
 							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
 							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 						)
@@ -341,13 +338,16 @@ namespace API.Services
 						),
 						medico: new ViewMedicos
 						(
-							idMedico: cita.IdMedicoNavigation.IdMedico,
+							IdMedico: cita.IdMedicoNavigation.IdMedico,
+							IdTrabajador: cita.IdMedicoNavigation.IdTrabajador,
 							Nombre: cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.Nombre
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno
 							+ " " + cita.IdMedicoNavigation.IdTrabajadorNavigation.IdPersonaNavigation.ApellidoPaterno,
 							Especialidad: cita.IdMedicoNavigation.Especialidad,
 							Consultorio: cita.IdMedicoNavigation.Consultorio ?? "",
+							Cedula: cita.IdMedicoNavigation.Cedula ?? "",
 							Status: cita.IdMedicoNavigation.Status ?? "",
+							Consulta: cita.IdMedicoNavigation.Consulta,
 							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraInicio,
 							cita.IdMedicoNavigation.IdTrabajadorNavigation.IdHorarioNavigation.HoraFin
 						)

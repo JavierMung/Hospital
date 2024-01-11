@@ -159,7 +159,7 @@ namespace API.Services
 			{
 				try
 				{
-					var servicio = await _context.Servicios.FindAsync(model.idServicio);
+					var servicio = await _context.Servicios.FindAsync(model.IdServicio);
 					if (servicio == null)
 					{
 						return new Result<ViewServicio>
@@ -170,8 +170,8 @@ namespace API.Services
 						};
 					}
 
-					servicio.Servicio1 = model.servicio;
-					servicio.Costo = model.costo;
+					servicio.Servicio1 = model.Servicio;
+					servicio.Costo = model.Costo;
 
 					_context.Servicios.Update(servicio);
 					await _context.SaveChangesAsync();

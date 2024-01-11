@@ -11,6 +11,10 @@ public partial class ServiciosTicket
 
     public int IdTicket { get; set; }
 
+    public int Cantidad { get; set; }
+
+    public double PreTotal { get; set; }
+
     public virtual Servicio IdServicioNavigation { get; set; } = null!;
 
     public virtual Ticket IdTicketNavigation { get; set; } = null!;

@@ -23,6 +23,7 @@ builder.Services.AddScoped<ICitasServices, CitasServices>();
 builder.Services.AddScoped<IPersonaServices, PersonaServices>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<ITicketServices, TicketServices>();
+builder.Services.AddScoped<IInsumosServices, InsumosServices>();
 builder.Services.AddDbContext<HospitalContext>();
 
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
@@ -67,8 +68,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-
-/*
- 
- */
