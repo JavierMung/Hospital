@@ -24,6 +24,7 @@ builder.Services.AddScoped<IPersonaServices, PersonaServices>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<ITicketServices, TicketServices>();
 builder.Services.AddScoped<IInsumosServices, InsumosServices>();
+builder.Services.AddScoped<IRecetaMedica, RecetaMedicaServices>();
 builder.Services.AddDbContext<HospitalContext>();
 
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>

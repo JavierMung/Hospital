@@ -58,11 +58,7 @@ namespace API.Controllers
 			{
 				var result = await operation();
 
-				if (result.Status == 204)
-				{
-					return StatusCode(StatusCodes.Status204NoContent, result);
-				}
-				else if (result.Status == 500)
+				if (result.Status == 500)
 				{
 					return StatusCode(StatusCodes.Status500InternalServerError, result);
 				}
