@@ -1,0 +1,35 @@
+
+.login-container {
+  font-family: "Comic Sans MS", Arial, sans-serif;
+  text-align: center;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+  background: #2891d6;
+  width: 100%;
+  max-width: 10000px;
+  margin: auto;
+  border-radius: 8px;
+  font-family: "Comic Sans MS", Arial, sans-serif;
+}
+
+.menu li a{
+  text-decoration: none;
+  padding: 20px;
+  color: rgb(255, 255, 255);
+  display: block;
+  transition: background-color 0.3s ease;
+}
+
+.menu li{
+  display: inline-block;
+  text-align: center;
+}
+
+.menu li a:hover{
+  background-color: #ffffff;
+  color: #000000;
+}
