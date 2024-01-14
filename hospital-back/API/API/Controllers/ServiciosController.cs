@@ -16,101 +16,107 @@ namespace API.Controllers
 		{
 			_servicioServices = servicioServices;
 		}
-		[HttpGet("obtenerServicio/{id}")]
-		public async Task<ActionResult<ViewServicio>> GetServicio(int id)
-		{
-			try
-			{
-				var res = await _servicioServices.GetServicio(id);
-				if (res == null) return StatusCode(StatusCodes.Status204NoContent, "No se encontraron sevicios con ese ID.");
-				return res;
-			}catch (Exception ex)
-			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Intentelo más tarde. ");
-			}
 
+		[HttpGet("obtenerServicio/{id}")]
+		public async Task<ActionResult<Result<ViewServicio>>> GetServicio(int id)
+		{
+			if (id <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
+
+			return await ExecuteOperation(async () => await _servicioServices.GetServicio(id));
 		}
 
 		[HttpGet("obtenerServicios")]
-		public async Task<ActionResult<List<ViewServicio>?>> GetALLServicios()
+		public async Task<ActionResult<Result<List<ViewServicio>>>> GetALLServicios()
+		{
+			return await ExecuteOperation(async () => await _servicioServices.GetAllServicios());
+		}
+
+
+		[HttpDelete("eliminarServicio/{id}")]
+		public async Task<ActionResult<Result<int>>> DeleteServicio(int id)
+		{
+			if (id <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
+
+			return await ExecuteOperation(async () => await _servicioServices.DeleteServicio(id));
+		}
+
+		[HttpPost("agregarServicio")]
+		public async Task<ActionResult<Result<ViewServicio>>> AddServicio([FromBody] ViewServicioAdd model)
+		{
+			if(model.costo <= 0)
+			{
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El costo no puede ser 0 o menor.",
+					Status = 400
+				});
+			}
+			return await ExecuteOperation(async () => await _servicioServices.AddServicio(model));
+		}
+
+		[HttpPut("actualizarServicio")]
+		public async Task<ActionResult<Result<ViewServicio>>> UpdateServicio([FromBody] ViewServicio model)
+		{
+			if (model.IdServicio <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
+			if (model.Costo <= 0)
+			{
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El costo no puede ser 0 o menor.",
+					Status = 400
+				});
+			}
+
+			return await ExecuteOperation(async () => await _servicioServices.UpdateServicio(model));
+		}
+
+		public async Task<ActionResult<Result<T>>> ExecuteOperation<T>(Func<Task<Result<T>>> operation)
 		{
 			try
 			{
-				var res = await _servicioServices.GetAllServicios();
-				if (res == null) return StatusCode(StatusCodes.Status204NoContent, "No se encontraron sevicios con ese ID.");
-				return res;
+				var result = await operation();
+
+				if (result.Status == 204)
+				{
+					return StatusCode(StatusCodes.Status204NoContent, result);
+				}
+				else if (result.Status == 500)
+				{
+					return StatusCode(StatusCodes.Status500InternalServerError, result);
+				}else if (result.Status == 400)
+				{
+					return StatusCode(StatusCodes.Status400BadRequest, result);
+				}
+
+				return StatusCode(StatusCodes.Status200OK, result);
 			}
 			catch (Exception ex)
 			{
-				return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Intentelo más tarde. ");
+				return StatusCode(StatusCodes.Status500InternalServerError, $"Error en el servidor: {ex.Message}. Inténtelo más tarde.");
 			}
-
 		}
 
-        [HttpDelete("eliminarServicio/{id}")]
-        public async Task<IActionResult> DeleteServicio(int id)
-        {
-            try
-            {
-                var resultado = await _servicioServices.DeleteServicio(id);
-
-                switch (resultado)
-                {
-                    case 0:
-                        return NotFound("Servicio no encontrado.");
-                    case 1:
-                        return Ok("Servicio eliminado con éxito.");
-                    case 2:
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Error al eliminar el servicio.");
-                    default:
-                        return StatusCode(StatusCodes.Status500InternalServerError, "Error inesperado.");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Aquí podrías registrar la excepción con algún mecanismo de logging
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error en el servidor. Intentelo más tarde.");
-            }
-        }
-
-        [HttpPost("agregarServicio")]
-        public async Task<ActionResult<ViewServicio>> AddServicio([FromBody] ViewServicio model)
-        {
-            try
-            {
-                var respuesta = await _servicioServices.AddServicio(model);
-                if (respuesta == null)
-                {
-                    return StatusCode(StatusCodes.Status404NotFound, "Error al crear el servicio, revise los datos por favor");
-                }
-
-                return respuesta;
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.ToString());
-            }
-        }
-
-        [HttpPut("actualizarServicio")]
-        public async Task<ActionResult<ViewServicio>> UpdateServicio([FromBody] ViewServicio model)
-        {
-            if (model == null)
-            {
-                return BadRequest("Datos de actualización inválidos.");
-            }
-
-            var resultado = await _servicioServices.UpdateServicio(model);
-
-            if (resultado == null)
-            {
-                return StatusCode(StatusCodes.Status404NotFound, "Error al crear el servicio, revise los datos por favor");
-            }
-
-            return resultado;
-        }
 
 
-
-    }
+	}
 }
