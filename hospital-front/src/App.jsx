@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createContext} from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Login from './login';
 import Menu from './MenuBar';
@@ -11,6 +11,7 @@ import Prueba from './prueba.jsx'
 const App = () => {
   const navigate = useNavigate;
   const [userRole, setUserRole] = useState(1);
+  const TrabajadorId = createContext(null);
 
   const handleLogin = (role) => {
     setUserRole(role);
@@ -79,7 +80,12 @@ const App = () => {
           {/*<Route path="/logout" element={<Logout onLogout={handleLogin}/>} />*/}
         </Routes>
         
-        <Prueba idTrabajador={3} />
+        
+        <TrabajadorId.Provider value ={5}>
+          <Prueba idTrabajador={3} />
+        </TrabajadorId.Provider>
+          
+        
       </div>
     </Router>
   );
