@@ -54,13 +54,13 @@ namespace API.Services
 				};
 
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
 				transaction.Rollback();
 				return new Result<ViewRecetaMedica>()
 				{
 					Model = null,
-					Message = "Ocurrio un error al crear la receta.",
+					Message = "Ocurrio un error al crear la receta.:" +e,
 					Status = StatusCodes.Status500InternalServerError
 				};
 			}
