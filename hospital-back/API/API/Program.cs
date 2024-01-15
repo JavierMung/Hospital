@@ -62,9 +62,15 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
+app.UseCors("MyPolicy");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+//app.UseResponseCompression();
+
+
 
 app.MapControllers();
 

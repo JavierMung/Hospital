@@ -31,18 +31,9 @@ namespace API.Services
 			}
 
 
-			var citas = await GetCitasByMedicoId(cita.IdMedico);
-
-			if (citas.Model != null)
+			if (!await ValidarFecha(cita.FechaCita, cita.IdMedico))
 			{
-
-				foreach (var cta in citas.Model)
-				{
-					if (cta.FechaCita.Date == cita.FechaCita.Date && cta.FechaCita.Hour == cita.FechaCita.Hour)
-					{
-						return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
-					}
-				}
+				return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
 			}
 
 			using var transaction = _context.Database.BeginTransaction();
@@ -97,7 +88,7 @@ namespace API.Services
 
 				}; ;
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				await transaction.RollbackAsync();
 				return new Result<ViewCita>
@@ -381,11 +372,31 @@ namespace API.Services
 
 		public async Task<Result<ViewCita>> UpdateCita(ViewCitaAdd cita)
 		{
+			var servicioMedicos = new MedicosServices(_context);
+
+			var medico = await servicioMedicos.GetMedico(cita.IdMedico);
+
+			if (medico.Model == null)
+			{
+				return new Result<ViewCita> { Model = null, Message = medico.Message, Status = medico.Status };
+
+			}
+
+			if (cita.FechaCita.Hour < medico.Model.HorarInicio.Hours || cita.FechaCita.Hour >= medico.Model.HoraFin.Hours)
+			{
+				return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
+			}
+
+
+			if (!await ValidarFecha(cita.FechaCita, cita.IdMedico))
+			{
+				return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
+			}
+
 			using var transaction = _context.Database.BeginTransaction();
 
 			try
 			{
-
 				var citaParaActualizar = await _context.Citas
 						.Include(c => c.IdPacienteNavigation)
 						.Include(c => c.IdMedicoNavigation)
@@ -397,23 +408,40 @@ namespace API.Services
 						.Where(p => p.IdCita == cita.id)
 						.FirstOrDefaultAsync();
 
-
 				if (citaParaActualizar == null)
 				{
 					return new Result<ViewCita>
 					{
 						Model = null,
 						Message = "No existe cita con ese ID.",
-						Status = 204
+						Status = 400
 
 					};
 				}
+
+				if (!await ValidarFecha(cita.FechaCita, cita.IdMedico))
+				{
+					return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
+				}
+
+				if (cita.Status == "Cancelada" && citaParaActualizar.Fecha.Date == DateTime.Now.Date && DateTime.Now.Hour > citaParaActualizar.Fecha.AddHours(-1).Hour)
+				{
+					return new Result<ViewCita>
+					{
+						Model = null,
+						Message = "Para cancelar deberá ser al menos 24 horas antes de la cita.",
+						Status = 400
+
+					};
+				}
+
+
 
 				citaParaActualizar.IdPacienteNavigation.Edad = cita.paciente.Edad;
 				citaParaActualizar.IdPacienteNavigation.Nombre = cita.paciente.Nombre;
 				citaParaActualizar.IdPacienteNavigation.ApellidoPaterno = cita.paciente.Apellido_Paterno;
 				citaParaActualizar.IdPacienteNavigation.ApellidoMaterno = cita.paciente.Apellido_Materno ?? "";
-				DateTime nuevaFechaHora = new DateTime(cita.FechaCita.Year, cita.FechaCita.Month, cita.FechaCita.Day, cita.FechaCita.Hour, 0, 0);
+				DateTime nuevaFechaHora = new(cita.FechaCita.Year, cita.FechaCita.Month, cita.FechaCita.Day, cita.FechaCita.Hour, 0, 0);
 
 				citaParaActualizar.Fecha = nuevaFechaHora;
 
@@ -424,7 +452,7 @@ namespace API.Services
 					"Cancelada" => 3,
 					"Concluida" => 4,
 					"Reprograma" => 5,
-					_ => throw new Exception("Error al actualizar es Status"),
+					_ => throw new Exception("Error al actualizar el Status."),
 				};
 
 				await _context.SaveChangesAsync();
@@ -435,13 +463,13 @@ namespace API.Services
 				return new Result<ViewCita>
 				{
 					Model = respuesta.Model,
-					Message = "Cita actualizada con exito",
+					Message = "Cita actualizada con exito.",
 					Status = 200
 
 				}; ;
 
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				await transaction.RollbackAsync();
 				_context.ChangeTracker.Clear();
@@ -449,12 +477,33 @@ namespace API.Services
 				return new Result<ViewCita>
 				{
 					Model = null,
-					Message = "Error al actualizar la cita",
+					Message = "Error al actualizar la cita.",
 					Status = 505
 
 				};
 			}
 
+		}
+
+		private async Task<bool> ValidarFecha(DateTime fecha, int IdMedico)
+		{
+
+
+			var citas = await GetCitasByMedicoId(IdMedico);
+
+			if (citas.Model != null)
+			{
+
+				foreach (var cta in citas.Model)
+				{
+					if ((cta.FechaCita.Date == fecha.Date && cta.FechaCita.Hour == fecha.Hour) && (cta.Status == "Aprobada" || cta.Status == "En espera"))
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
 		}
 
 		/*private async List<DateTime> HorariosDisponibles()
