@@ -40,14 +40,14 @@ const App = () => {
           { label: 'Medico', link: '/Recepcionista/Recepsionista' },
           { label: 'Recepcionista', link: '/Medico/Medico' },
           { label: 'Cliente', link: '/Cliente/Cliente' },
-          { label: 'Cerrar Sesion', UserActivation: handleLogout },
+          { label: 'Cerrar Sesion', link: '/logout' },
         ];
       case 3:
         return [
           { label: 'Recepcionista', link: '/Recepcionista/Recepsionista' },
           { label: 'Cliente', link: '/Medico/Medico' },
           { label: 'Medico', link: '/Cliente/Cliente' },
-          { label: 'Cerrar Sesion', action: handleLogout },
+          { label: 'Cerrar Sesion', link: '/logout' },
           
         ];
       case 4:
@@ -55,7 +55,7 @@ const App = () => {
             { label: 'Recepcionista', link: '/Recepcionista/Recepsionista' },
             { label: 'Cliente', link: '/Medico/Medico' },
             { label: 'Medico', link: '/Cliente/Cliente' },
-            { label: 'Cerrar Sesion', action: handleLogout },
+            { label: 'Cerrar Sesion', link: '/logout' },
             
           ];
       default:
@@ -77,7 +77,7 @@ const App = () => {
           <Route path="/Medico/Medico" element={<Medico />} />
           <Route path="/Cliente/Cliente" element={<Cliente />} />
           <Route path="/login" element={<Login onLogin={handleLogin}/>} />
-          {/*<Route path="/logout" element={<Logout onLogout={handleLogin}/>} />*/}
+          <Route path="/logout" element={<Logout onLogout={handleLogin}/>} />
         </Routes>
         
         
