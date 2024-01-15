@@ -24,7 +24,7 @@ const Login = ({ onLogin }) => {
       }
 
       const loginData = await loginResponse.json();
-      const { idTrabajador } = loginData.model;
+      const { idTrabajador, username: returnedUsername } = loginData.model;
 
       // Obtener datos del trabajador usando el idTrabajador
       const workerResponse = await fetch(`https://localhost:7079/Trabajadores/obtenerTrabajador/${idTrabajador}`);
@@ -32,24 +32,12 @@ const Login = ({ onLogin }) => {
 
       if (workerResponse.ok) {
         const { idRol } = workerData.model;
-        onLogin(idRol);
+
+        // Llamar a onLogin con un objeto que contiene el idRol, username e idTrabajador
+        onLogin({ idRol, username: returnedUsername, idTrabajador });
+
         alert('Inicio de sesión exitoso');
-        
-        // Redirigir según el rol (ajustar según tu lógica)
-        switch (idRol) {
-          case 2:
-            navigate('/Recepcionista/Recepsionista');
-            break;
-          case 3:
-            navigate('/Medico/Medico');
-            break;
-          case 4:
-            navigate('/Recepcionista/Recepsionista'); // Ajusta según tus necesidades
-            break;
-          default:
-            navigate('/'); // Puedes redirigir a una página por defecto
-            break;
-        }
+        navigate('/Inicio');
       } else {
         throw new Error('Error al obtener datos del trabajador.');
       }
@@ -63,7 +51,7 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <h2>Login</h2>
       <div className="input-container">
-        <label htmlFor="username">Usuario:</label>
+        <label htmlFor="username" className='input'>Usuario: </label>
         <input
           type="text"
           id="username"
@@ -72,7 +60,7 @@ const Login = ({ onLogin }) => {
         />
       </div>
       <div className="input-container">
-        <label htmlFor="password">Contraseña:</label>
+        <label htmlFor="password" className='input'>Contraseña: </label>
         <input
           type="password"
           id="password"
@@ -80,7 +68,7 @@ const Login = ({ onLogin }) => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-      <button className="login-button" onClick={handleLogin}>
+      <button className="button" onClick={handleLogin}>
         Enviar
       </button>
     </div>
