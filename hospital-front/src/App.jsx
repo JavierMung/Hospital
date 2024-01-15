@@ -89,9 +89,9 @@ const App = () => {
         </Routes>
         
         
-        <TrabajadorId.Provider value ={5}>
+        {/* <TrabajadorId.Provider value ={5}>
           <Prueba idTrabajador={3} />
-        </TrabajadorId.Provider>
+        </TrabajadorId.Provider> */}
           
         
       </div>

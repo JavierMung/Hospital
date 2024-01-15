@@ -1,0 +1,58 @@
+/* Estilos para el contenedor del formulario */
+.form-container {
+    width: 50%;
+    margin: auto;
+    margin-top: 30px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Estilos para el encabezado del formulario */
+  .form-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  /* Estilos para los campos de entrada */
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  /* Estilos para el botón de envío */
+  .form-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  /* Estilos para los mensajes de error */
+  .error-message {
+    color: red;
+  }
+  /* Estilos para el botón */
+  .show-hide-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.show-hide-button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para ocultar el formulario */
+.RegistrarCita {
+    display: none;
+}
+  
