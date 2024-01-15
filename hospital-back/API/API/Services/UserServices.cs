@@ -37,12 +37,16 @@ namespace API.Services
 				{
 					return new Result<ViewUserToken>() { Model = null, Message = $"No se encontro el usuario {user.Username}", Status = StatusCodes.Status204NoContent };
 				}
+
+				var trabajador = await _context.Usuarios.Where(usuario => usuario.Usuario1 == user.Username).FirstOrDefaultAsync();
+
+
 				if (resultado == "Contraseña válida")
 				{
-					
+
 					return new Result<ViewUserToken>()
 					{
-						Model = new ViewUserToken(user.Username, Token.GenerateJwtToken(user.Username, 90) ),
+						Model = new ViewUserToken(user.Username, trabajador.IdTrabajador, Token.GenerateJwtToken(user.Username, 90)),
 						Message = "Usuario correcto.",
 						Status = StatusCodes.Status200OK
 					};
@@ -84,7 +88,7 @@ namespace API.Services
 
 					return new Result<ViewUserToken>()
 					{
-						Model = new ViewUserToken(user.Username, ""),
+						Model = new ViewUserToken(user.Username, user.IdTrabajador ,""),
 						Message = "Usuario creado con exito.",
 						Status = StatusCodes.Status200OK
 					};
@@ -168,7 +172,7 @@ namespace API.Services
 			try
 			{
 
-				var valido = await ValidateToken(new ViewUserToken(Username: user.Username, Token: user.Token));
+				var valido = await ValidateToken(new ViewUserToken(Username: user.Username, 0 ,Token: user.Token));
 
 				if (valido.Status != 200)
 				{

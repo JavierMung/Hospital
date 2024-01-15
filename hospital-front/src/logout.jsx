@@ -5,16 +5,14 @@ const Logout = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    const confirmLogout = window.confirm('¿Estás seguro de que deseas cerrar sesión?');
-    if (confirmLogout) {
-      onLogout(1); // Función para manejar el cierre de sesión, podría ser similar a handleLogin
-      navigate('/login'); // Redirige a la página de inicio de sesión después de cerrar sesión
-    }
+    onLogout(0); // Función para manejar el cierre de sesión, podría ser similar a handleLogin
+    navigate('/login'); // Redirige a la página de inicio de sesión después de cerrar sesión
   };
 
   return (
     <div>
-      <button onClick={handleLogout}>Cerrar Sesión</button>
+      <h2>Estas seguro que deseas cerrar sesion?</h2>
+      <button onClick={handleLogout}>Confirmar</button>
     </div>
   );
 };

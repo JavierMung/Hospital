@@ -1,30 +1,60 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-//import './index.css'; 
 
 const Login = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     // Validar el usuario y contraseña
-    if (username === 'paco' && password === 'cliente') {
-      onLogin(2);
-      alert('Inicio de sesion Exitoso');
-      navigate('/Recepcionista/Recepsionista');
-      
-    } else if (username === 'vanesa' && password === 'medico') {
-      onLogin(3);
-      alert('Inicio de sesion Exitoso');
-      navigate('/Recepcionista/Recepsionista');
+    const credentials = { username, password };
 
-    } else if (username === 'cancerbero' && password === 'recepcionista') {
-      onLogin(4);
-      alert('Inicio de sesion Exitoso');
-      navigate('/Recepcionista/Recepsionista');
-      
-    } else {
+    try {
+      const loginResponse = await fetch('https://localhost:7079/User/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (!loginResponse.ok) {
+        throw new Error('Credenciales incorrectas.');
+      }
+
+      const loginData = await loginResponse.json();
+      const { idTrabajador } = loginData.model;
+
+      // Obtener datos del trabajador usando el idTrabajador
+      const workerResponse = await fetch(`https://localhost:7079/Trabajadores/obtenerTrabajador/${idTrabajador}`);
+      const workerData = await workerResponse.json();
+
+      if (workerResponse.ok) {
+        const { idRol } = workerData.model;
+        onLogin(idRol);
+        alert('Inicio de sesión exitoso');
+        
+        // Redirigir según el rol (ajustar según tu lógica)
+        switch (idRol) {
+          case 2:
+            navigate('/Recepcionista/Recepsionista');
+            break;
+          case 3:
+            navigate('/Medico/Medico');
+            break;
+          case 4:
+            navigate('/Recepcionista/Recepsionista'); // Ajusta según tus necesidades
+            break;
+          default:
+            navigate('/'); // Puedes redirigir a una página por defecto
+            break;
+        }
+      } else {
+        throw new Error('Error al obtener datos del trabajador.');
+      }
+    } catch (error) {
+      console.error('Error de autenticación:', error);
       alert('Credenciales incorrectas. Por favor, verifica usuario y contraseña.');
     }
   };
@@ -58,3 +88,4 @@ const Login = ({ onLogin }) => {
 };
 
 export default Login;
+
