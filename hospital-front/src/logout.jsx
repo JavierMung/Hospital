@@ -5,7 +5,7 @@ const Logout = ({ onLogout }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    onLogout(1); // Función para manejar el cierre de sesión, podría ser similar a handleLogin
+    onLogout(0); // Función para manejar el cierre de sesión, podría ser similar a handleLogin
     navigate('/login'); // Redirige a la página de inicio de sesión después de cerrar sesión
   };
 
