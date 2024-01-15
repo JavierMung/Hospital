@@ -26,16 +26,23 @@ namespace API.Controllers
 				return BadRequest(new Result<ViewCita> { Message = "El ID del medico es incorrecto.", Status = StatusCodes.Status400BadRequest });
 			}
 
-			if (DateTime.Now.AddHours(1) > cita.FechaCita)
-			{
-
-				return BadRequest(new Result<ViewCita> { Message = "La cita solo se puede crear con una hora de anticipación.", Status = StatusCodes.Status400BadRequest });
-
-			}
 			if (cita.paciente.CURP == null)
 			{
 
 				return BadRequest(new Result<ViewCita> { Message = "El CURP no puede ser NULL", Status = StatusCodes.Status400BadRequest });
+
+			}
+
+			if (cita.FechaCita.AddMonths(-3) > DateTime.Now)
+			{
+				return BadRequest(new Result<ViewCita> { Message = "La cita tiene debe ser menor a 3 meses.", Status = StatusCodes.Status400BadRequest });
+
+			}
+
+			if (DateTime.Now.AddHours(1) > cita.FechaCita)
+			{
+
+				return BadRequest(new Result<ViewCita> { Message = "La cita solo se puede crear con minimo una hora de anticipación.", Status = StatusCodes.Status400BadRequest });
 
 			}
 			var a = cita.paciente.CURP.Trim().Length;
@@ -46,6 +53,8 @@ namespace API.Controllers
 				return BadRequest(new Result<ViewCita> { Message = "El CURP debe tener 18 caracteres alfanumericos", Status = StatusCodes.Status400BadRequest });
 
 			}
+
+
 			return await ExecuteOperation(async () => await _citas.CreateCita(cita));
 		}
 		[HttpGet("obtenerCitasByMedicoId/{id}")]

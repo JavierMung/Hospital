@@ -21,7 +21,7 @@ namespace API.Controllers
 			_configuration = configuration;
 		}
 
-		[HttpGet("obtenerMedico/{id}")]
+		[HttpGet("obtenerMedicoById/{id}")]
 		public async Task<ActionResult<Result<ViewMedicos>>> GetMedico(int id)
 		{
 			if (id <= 0)
@@ -33,6 +33,20 @@ namespace API.Controllers
 				});
 
 			return await ExecuteOperation(async () => await _medicosServices.GetMedico(id));
+		}
+		[HttpGet("obtenerCitasByTrabajadorId/{id}")]
+
+		public async Task<ActionResult<Result<ViewMedicos>>> GetMedicoByTrabajadorId(int id)
+		{
+			if (id <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID es incorrecto.",
+					Status = 400
+				});
+
+			return await ExecuteOperation(async () => await _medicosServices.GetMedicoByIdTrabajador(id));
 		}
 
 		[HttpGet("obtenerMedicos")]
@@ -46,9 +60,17 @@ namespace API.Controllers
 		{
 			return await ExecuteOperation(async () => await _medicosServices.UpdateMedico(medico));
 		}
+
 		[HttpPost("agregarMedico")]
-		public async Task<ActionResult<Result<ViewMedicoAdd>>> AddMedico([FromBody] ViewMedicoAdd medico)
+		public async Task<ActionResult<Result<ViewMedicos>>> AddMedico([FromBody] ViewMedicoAdd medico)
 		{
+			if (medico.IdTrabajador <= 0)
+				return BadRequest(new Result<ViewTrabajador>
+				{
+					Model = null,
+					Message = "El ID del trabajador es incorrecto.",
+					Status = 400
+				});
 			return await ExecuteOperation(async () => await _medicosServices.AddMedico(medico));
 		}
 
@@ -58,11 +80,7 @@ namespace API.Controllers
 			{
 				var result = await operation();
 
-				if (result.Status == 204)
-				{
-					return StatusCode(StatusCodes.Status204NoContent, result);
-				}
-				else if (result.Status == 500)
+				if (result.Status == 500)
 				{
 					return StatusCode(StatusCodes.Status500InternalServerError, result);
 				}
