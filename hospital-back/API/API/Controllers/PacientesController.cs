@@ -46,7 +46,7 @@ namespace API.Controllers
 
 			}
 
-			return await ExecuteOperation(async () => await _pacientes.GetPacienteByCURP(Paciente));
+			return await ExecuteOperation(async () => await _pacientes.UpdatePacienteByCURP(Paciente));
 		}
 
 		public async Task<ActionResult<Result<T>>> ExecuteOperation<T>(Func<Task<Result<T>>> operation)
