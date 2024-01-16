@@ -1,13 +1,26 @@
-import React, { useState} from 'react';
+import Ticket from "./Ticket";
+import CrearTicket from "./CrearTicket";
+import React, { useState,} from "react";
+import "./styles.css";
 
-const Recepsionista = ({TrabId}) => {
-    const idTrabajador = (TrabId);
 
-    return (
-        <div>
-            Este es el componente Recepsionista para el Trabajador con ID: {idTrabajador}
-        </div>
-    );
-};
+function Recepcionista() {
+  const [botonSeleccionado, setBotonSeleccionado] = useState("");
 
-export default Recepsionista;
+  return (
+    <div>
+      <h1>Recepcionista</h1>
+      <div>
+        {botonSeleccionado === "crear" && <CrearTicket />}
+        {botonSeleccionado === "mostrar" && <Ticket />}
+      </div>
+      <div>
+        <p><br/></p>
+        <button className="button" onClick={() => setBotonSeleccionado("crear") }style={{margin:"10px"}}>Agregar Ticket</button>
+        <button className="button" onClick={() => setBotonSeleccionado("mostrar")}>Mostrar Ticket</button>
+      </div>
+    </div>
+  );
+}
+
+export default Recepcionista;
