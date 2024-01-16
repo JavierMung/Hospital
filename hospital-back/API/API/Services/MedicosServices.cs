@@ -194,8 +194,16 @@ namespace API.Services
 
 				if (medico == null)
 				{
-					return new Result<ViewMedicos> { Model = null, Message = "No existe medico con ese ID.", Status = StatusCodes.Status204NoContent };
+					return new Result<ViewMedicos> { Model = null, Message = "No existe medico con ese ID.", Status = StatusCodes.Status400BadRequest };
 				}
+
+				var citasPorTener = await _context.Citas.Where(cita => cita.IdMedico == medicoAdd.IdMedico && (cita.IdStatus == 1 || cita.IdStatus == 2)).ToListAsync();
+
+				if (medico.Status == "INACTIVO" && citasPorTener != null)
+				{
+					return new Result<ViewMedicos> { Model = null, Message = "No se puede actualizar a Inactivo a un medico que tenga citas En espera o Aprobadas.", Status = StatusCodes.Status400BadRequest };
+				}
+
 				medico.Consultorio = medicoAdd.Consultorio;
 				medico.Especialidad = medicoAdd.Especialidad;
 				medico.Status = medicoAdd.Status;

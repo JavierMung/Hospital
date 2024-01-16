@@ -31,13 +31,7 @@ namespace API.Services
 
 				if (pas == null || pas.IdPaciente <= 0)
 				{
-					return new Result<ViewPaciente>
-					{
-						Model = null,
-						Message = "Error al crear el paciente",
-						Status = StatusCodes.Status500InternalServerError
-
-					};
+					throw new Exception();
 				}
 
 				ViewPaciente res = new ViewPaciente(
@@ -46,10 +40,10 @@ namespace API.Services
 					Apellido_Materno: pas.ApellidoMaterno,
 					Apellido_Paterno: pas.ApellidoPaterno,
 					Edad: pas.Edad,
-					CURP:pas.Curp
+					CURP: pas.Curp
 				);
 
-				 return new Result<ViewPaciente>
+				return new Result<ViewPaciente>
 				{
 					Model = res,
 					Message = "Paciente creado con exito",
@@ -75,9 +69,41 @@ namespace API.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<Result<ViewPaciente>> GetPacienteById(int id)
+		public async Task<Result<ViewPaciente>> GetPacienteByCURP(string CURP)
 		{
-			throw new NotImplementedException();
+			try
+			{
+
+				var paciente = await _context.Pacientes.Where(pac => pac.Curp == CURP).FirstOrDefaultAsync();
+				if (paciente == null)
+				{
+					return new Result<ViewPaciente>
+					{
+						Model = null,
+						Message = "El paciente no existe.",
+						Status = StatusCodes.Status200OK
+
+					};
+				}
+
+				return new Result<ViewPaciente>
+				{
+					Model = new ViewPaciente(paciente.IdPaciente, paciente.Nombre, paciente.ApellidoPaterno, paciente.ApellidoMaterno, paciente.Edad, paciente.Curp),
+					Message = "Paciente recuperado con exito.",
+					Status = StatusCodes.Status200OK
+
+				};
+			}
+			catch (Exception)
+			{
+				return new Result<ViewPaciente>
+				{
+					Model = null,
+					Message = "Error al crear el paciente",
+					Status = StatusCodes.Status500InternalServerError
+
+				};
+			}
 		}
 
 		public Task<Result<List<ViewPaciente>>> GetPacientes()
@@ -85,9 +111,50 @@ namespace API.Services
 			throw new NotImplementedException();
 		}
 
-		public Task<Result<ViewPaciente>> UpdateCita(ViewPaciente paciente)
+		public async Task<Result<ViewPaciente>> UpdatePacienteByCURP(ViewPaciente paciente)
 		{
-			throw new NotImplementedException();
+			using var transaction = _context.Database.BeginTransaction();
+			try
+			{
+				var pacienteParaActualizar = await _context.Pacientes.Where(pac => pac.Curp == paciente.CURP).FirstOrDefaultAsync();
+				if (pacienteParaActualizar == null)
+				{
+					return new Result<ViewPaciente>
+					{
+						Model = null,
+						Message = "El paciente no existe.",
+						Status = StatusCodes.Status200OK
+
+					};
+				}
+
+				pacienteParaActualizar.Edad = paciente.Edad;
+				pacienteParaActualizar.ApellidoMaterno = paciente.Apellido_Materno;
+				pacienteParaActualizar.ApellidoPaterno = paciente.Apellido_Paterno;
+
+				await _context.SaveChangesAsync();
+				transaction.Commit();
+
+				return new Result<ViewPaciente>
+				{
+					Model = paciente,
+					Message = "Paciente actualizado con exito.",
+					Status = StatusCodes.Status200OK
+
+				};
+
+			}
+			catch (Exception)
+			{
+				transaction.Rollback();
+				return new Result<ViewPaciente>
+				{
+					Model = null,
+					Message = "Error al actualizar el paciente",
+					Status = StatusCodes.Status500InternalServerError
+
+				};
+			}
 		}
 	}
 }

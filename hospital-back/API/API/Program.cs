@@ -25,6 +25,7 @@ builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<ITicketServices, TicketServices>();
 builder.Services.AddScoped<IInsumosServices, InsumosServices>();
 builder.Services.AddScoped<IRecetaMedica, RecetaMedicaServices>();
+builder.Services.AddScoped<IPacientesServices, PacientesServices>();
 builder.Services.AddDbContext<HospitalContext>();
 
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
@@ -42,16 +43,16 @@ builder.Services.AddAuthentication(options =>
 
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-    };
+	options.RequireHttpsMetadata = false;
+	options.SaveToken = true;
+	options.TokenValidationParameters = new TokenValidationParameters
+	{
+		ValidateIssuerSigningKey = true,
+		IssuerSigningKey = new SymmetricSecurityKey(key),
+		ValidateIssuer = false,
+		ValidateAudience = false,
+		ValidateLifetime = true,
+	};
 });
 var app = builder.Build();
 
