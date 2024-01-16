@@ -49,6 +49,10 @@ namespace API.Services
 				{
 					return new Result<ViewCita> { Model = null, Message = "El paciente ya existe con ese CURP.", Status = 400 };
 				}
+				else if (pacienteViejo == null && !cita.Nuevo)
+				{
+					return new Result<ViewCita> { Model = null, Message = "El paciente no existe con ese CURP.", Status = 400 };
+				}
 				else if (pacienteViejo != null && !cita.Nuevo)
 				{
 					paciente = await spacientes.GetPacienteByCURP(cita.paciente.CURP);
