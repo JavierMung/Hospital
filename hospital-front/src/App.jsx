@@ -9,6 +9,7 @@ import Logout from './Logout.jsx';
 import Prueba from './prueba.jsx';
 import Inicio from './Inicio.jsx';
 import Admin from './Admi/Administrador.jsx';
+import CreaM from './Admi/CrearMedico.jsx'
 
 const App = () => {
   const navigate = useNavigate;
@@ -55,7 +56,8 @@ const App = () => {
         return [
           //Menu para Administrador
           { label: 'Inicio', link: '/Inicio' },
-          { label: `Administrar`, link: '/Admi/Administrador' },
+          { label: `Dar de alta Medico`, link: '/Admi/CrearMedico' },
+          { label: `Administrar Medicos`, link: '/Admi/Administrador' },
           { label: `${user.username}`, /*link: '/' */},
           { label: 'Cerrar Sesion', link: '/Logout' },
         ];
@@ -93,6 +95,7 @@ const App = () => {
           {/* Definición de rutas */}
           <Routes>
             <Route path="/Inicio" element={<Inicio />} />
+            <Route path="/Admi/CrearMedico" element={<CreaM TrabId={user.idTrabajador}/>} />
             <Route path="/Admi/Administrador" element={<Admin TrabId={user.idTrabajador}/>} />
             <Route path="/Recepcionista/Recepsionista" element={<Receps TrabId={user.idTrabajador}/>} />
             <Route path="/Medico/Medico" element={<Medico TrabId={user.idTrabajador}/>} />
