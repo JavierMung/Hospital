@@ -1,11 +1,11 @@
 import React, { useState} from 'react';
 
-const Medico = ({TrabId}) => {
-    const idTrabajador = (TrabId);
+const Medico = ({mediData}) => {
+    const idTrabajador = (mediData);
 
     return (
         <div>
-            Este es el componente Medico para el Trabajador con ID: {idTrabajador}
+            Este es el componente Medico para el Trabajador con ID: {mediData.idMedico}
         </div>
     );
 };
