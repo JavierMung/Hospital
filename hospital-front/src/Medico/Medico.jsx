@@ -67,6 +67,7 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
         return data; // La API devuelve un objeto que incluye model, message y status
         }));
         const recetasValidas = recetas.filter(receta => receta.model !== null);
+        console.log(recetas)
         setRecetasMedicas(recetasValidas);
         setError('Recetas médicas consultadas correcatemente')
     } catch (error) {
@@ -113,6 +114,7 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
 
       // Lógica después de una receta médica exitosa
       setError('Receta médica creada exitosamente');
+      console.log(response)
       setPrescription({ idCita: '', posologia: '' });
 
     } catch (error) {
@@ -295,15 +297,20 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
   <table>
     <thead>
       <tr>
-        <th>ID Cita</th>
-        <th>Posología
-        </th>
+        <th>N° Receta</th>
+        <th>Fecha</th>
+        <th>Nombre paciente</th>
+        <th>Nombre Médico</th>
+        <th>Posología</th>
       </tr>
     </thead>
     <tbody>
       {recetasMedicas.map((receta) => (
         <tr key={receta.model.idRecetaMedica}>
           <td>{receta.model.idRecetaMedica}</td>
+          <td>{receta.model.cita.fechaCita}</td>
+          <td>{receta.model.cita.paciente.nombre}</td>
+          <td>{receta.model.cita.medico.nombre}</td>
           <td>{receta.model.posologia}</td>
         </tr>
       ))}
