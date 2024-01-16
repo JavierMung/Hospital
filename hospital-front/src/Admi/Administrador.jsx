@@ -89,7 +89,7 @@ const Administrador = () => {
 
   return (
     <div>
-      <h2>Eliminar </h2>
+      <h2>Administrar Médicos </h2>
       <div>
         <label>Filtrar por estado:</label>
         <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
@@ -100,16 +100,16 @@ const Administrador = () => {
       </div>
       <div>
         <h3>Listado de Médicos</h3>
-        <ul>
+        <ul className='login-container3'>
           {filtrarMedicos().map((medico) => (
             <li key={medico.idMedico}>
-              id: {medico.idMedico} {medico.nombre} - {medico.status}
+              id medico: {medico.idMedico} {medico.nombre} - {medico.status}
               <button
                 onClick={() =>
                   actualizarStatusMedico(medico.idMedico, medico.status === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO')
                 }
               >
-                Eliminar
+                Cambiar Estado
               </button>
             </li>
           ))}

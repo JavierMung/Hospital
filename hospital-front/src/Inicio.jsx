@@ -1,8 +1,8 @@
 function Inicio (){
     return (
-        <div>
-            este es el inicio
-        </div>
+        <h2>
+            Bienvenido al hospital
+        </h2>
     );
 }
 export default Inicio;

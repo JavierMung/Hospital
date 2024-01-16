@@ -116,7 +116,7 @@ const App = () => {
             //Menu para Medico
             { label: 'Inicio', link: '/Inicio' },
             { label: `Medico`, link: '/Medico/Medico' },
-            { label: `hola ${medicData.idMedico}`, /*link: '/' */},
+            { label: `${user.username}`, /*link: '/' */},
             { label: 'Cerrar Sesion', link: '/Logout' },
             
           ];
