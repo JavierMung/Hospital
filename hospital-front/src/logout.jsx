@@ -11,8 +11,9 @@ const Logout = ({ onLogout }) => {
 
   return (
     <div>
-      <h2>Estas seguro que deseas cerrar sesion?</h2>
-      <button onClick={handleLogout}>Confirmar</button>
+      <h2 className='login-container'>Estas seguro que deseas cerrar sesion?
+      <button onClick={handleLogout} className='button'>Confirmar</button>
+      </h2>
     </div>
   );
 };

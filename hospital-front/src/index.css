@@ -1,9 +1,3 @@
-
-.login-container {
-  font-family: "Comic Sans MS", Arial, sans-serif;
-  text-align: center;
-}
-
 .menu {
   list-style: none;
   padding: 0;
@@ -32,4 +26,57 @@
 .menu li a:hover{
   background-color: #ffffff;
   color: #000000;
+}
+
+.login-container {
+  font-family: "Comic Sans MS", Arial, sans-serif;
+  text-align: center;
+  margin: 100px auto; /* El valor 'auto' centra horizontalmente */
+  padding: 10px;
+  border: 1px solid #000000;
+  text-align: center;
+  border-radius: 15px;
+  background-color: #e0e0e0;
+  width: 30%; /* Ancho fijo para el elemento */
+  
+}
+
+.input-container {
+  margin-bottom: 10px;
+}
+
+input {
+  border-radius: 5px;
+  text-align: center;
+  border: 2px solid #000000;
+}
+
+button {
+  background-image: linear-gradient(150deg, #2891d6, #2891d6, #2891d6);
+  padding: 12px 20px;
+  border-radius: 8px;
+  color: white;
+  display: flex, inline-block; 
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+  font-weight: 300;
+  text-transform: uppercase;
+  font-family: "Comic Sans MS", Arial, sans-serif;
+  /* Cambio de tipo de letra */
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-top: 10px;
+  border: 1px solid #000000;
+}
+
+button:active {
+  padding: 10px 20px;
+  transition: .1s;
+}
+/* Estilo para los botones al pasar el cursor sobre ellos */
+button:hover {
+  transform: scale(1.1);
+  transition: .3s;
 }

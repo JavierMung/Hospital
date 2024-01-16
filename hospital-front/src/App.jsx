@@ -1,69 +1,82 @@
-import React, { useState, createContext} from 'react';
+import React, { useState, createContext, useEffect} from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
-import Login from './login';
+import Login from './Login.jsx';
 import Menu from './MenuBar';
 import Receps from './Recepcionista/Recepsionista.jsx';
 import Medico from './Medico/Medico.jsx';
 import Cliente from './Cliente/Cliente.jsx';
-import Logout from './logout.jsx'
-import Prueba from './prueba.jsx'
+import Logout from './Logout.jsx';
+import Prueba from './prueba.jsx';
+import Inicio from './Inicio.jsx';
+import Admin from './Admi/Administrador.jsx';
+import CreaM from './Admi/CrearMedico.jsx'
 
 const App = () => {
   const navigate = useNavigate;
   const [userRole, setUserRole] = useState(0);
   const TrabajadorId = createContext(null);
+  const [user, setUser] = useState({
+    idRol: 0,
+    username: null,
+    idTrabajador: null,
+  });
 
-  const handleLogin = (role) => {
-    setUserRole(role);
+  useEffect(() => {
+    // Recuperar el estado del usuario desde localStorage al cargar la aplicación
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleUser = ({ idRol, username, idTrabajador }) => {
+    setUser({ idRol, username, idTrabajador });
+    // Guardar el estado del usuario en localStorage
+    localStorage.setItem('user', JSON.stringify({ idRol, username, idTrabajador }));
+  };
+
+  const handleLogout = (role) => {
+    setUser({ idRol: role, username: null, idTrabajador: null });
+    // Eliminar el estado del usuario de localStorage al cerrar sesión
+    localStorage.removeItem('user');
   };
   
-  const handleLogout = () => {
-    const confirmLogout = window.confirm('¿Estás seguro de que deseas cerrar sesión?');
-    if (confirmLogout) {
-      setUserRole(0);
-      navigate('/login'); // Redirige a la página de inicio de sesión después de cerrar sesión
-    }
-  }
 
   // Define los elementos de menú según el rol
   const getMenuItems = () => {
-    switch (userRole) {
+    switch (user.idRol) {
       case 0:
         return [
-          { label: 'Recepcionista', link: '/Recepcionista/Recepsionista' },
-          { label: 'Medico', link: '/Medico/Medico' },
+          //Menu para Cliente (Por defecto)
+          { label: 'Inicio', link: '/Inicio' },
           { label: 'Cliente', link: '/Cliente/Cliente' },
-          { label: 'IniciarSesion', link: '/login' },
+          { label: 'IniciarSesion', link: '/Login' },
         ];
       case 1:
         return [
-          { label: 'Medico', link: '/Recepcionista/Recepsionista' },
-          { label: 'Recepcionista', link: '/Medico/Medico' },
-          { label: 'Cliente', link: '/Cliente/Cliente' },
-          { label: 'Cerrar Sesion', link: '/logout' },
-        ];
-      case 2:
-        return [
-          { label: 'Recepcionista', link: '/Recepcionista/Recepsionista' },
-          { label: 'Cliente', link: '/Medico/Medico' },
-          { label: 'Medico', link: '/Cliente/Cliente' },
-          { label: 'Cerrar Sesion', link: '/logout' },
-          
+          //Menu para Administrador
+          { label: 'Inicio', link: '/Inicio' },
+          { label: `Dar de alta Medico`, link: '/Admi/CrearMedico' },
+          { label: `Administrar Medicos`, link: '/Admi/Administrador' },
+          { label: `${user.username}`, /*link: '/' */},
+          { label: 'Cerrar Sesion', link: '/Logout' },
         ];
       case 3:
           return [
+            //Menu para Recepcionista
+            { label: 'Inicio', link: '/Inicio' },
             { label: 'Recepcionista', link: '/Recepcionista/Recepsionista' },
-            { label: 'Cliente', link: '/Medico/Medico' },
-            { label: 'Medico', link: '/Cliente/Cliente' },
-            { label: 'Cerrar Sesion', link: '/logout' },
+            { label: `${user.username}`, /*link: '/' */},
+            { label: 'Cerrar Sesion', link: '/Logout' },
             
           ];
-      case 4:
+      case 5:
           return [
-            { label: 'Recepcionista', link: '/Recepcionista/Recepsionista' },
-            { label: 'Cliente', link: '/Medico/Medico' },
-            { label: 'Medico', link: '/Cliente/Cliente' },
-            { label: 'Cerrar Sesion', link: '/logout' },
+            //Menu para Medico
+            { label: 'Inicio', link: '/Inicio' },
+            { label: `Medico`, link: '/Medico/Medico' },
+            { label: `${user.username}`, /*link: '/' */},
+            { label: 'Cerrar Sesion', link: '/Logout' },
             
           ];
       default:
@@ -77,21 +90,22 @@ const App = () => {
   return (
     <Router>
       <div>
-        <Menu menus={menuItems} />
+        <TrabajadorId.Provider value ={user.idTrabajador}>
+          <Menu menus={menuItems} />
+          {/* Definición de rutas */}
+          <Routes>
+            <Route path="/Inicio" element={<Inicio />} />
+            <Route path="/Admi/CrearMedico" element={<CreaM TrabId={user.idTrabajador}/>} />
+            <Route path="/Admi/Administrador" element={<Admin TrabId={user.idTrabajador}/>} />
+            <Route path="/Recepcionista/Recepsionista" element={<Receps TrabId={user.idTrabajador}/>} />
+            <Route path="/Medico/Medico" element={<Medico TrabId={user.idTrabajador}/>} />
+            <Route path="/Cliente/Cliente" element={<Cliente />} />
+            <Route path="/Login" element={<Login onLogin={handleUser}/>} />
+            <Route path="/Logout" element={<Logout onLogout={handleLogout}/>} />
+          </Routes>
 
-        {/* Definición de rutas */}
-        <Routes>
-          <Route path="/Recepcionista/Recepsionista" element={<Receps />} />
-          <Route path="/Medico/Medico" element={<Medico />} />
-          <Route path="/Cliente/Cliente" element={<Cliente />} />
-          <Route path="/login" element={<Login onLogin={handleLogin}/>} />
-          <Route path="/logout" element={<Logout onLogout={handleLogin}/>} />
-        </Routes>
-        
-        
-        {/* <TrabajadorId.Provider value ={5}>
-          <Prueba idTrabajador={3} />
-        </TrabajadorId.Provider> */}
+          {/*<Prueba idTrabajador={3}/>*/}
+        </TrabajadorId.Provider>
           
         
       </div>
@@ -100,5 +114,6 @@ const App = () => {
 };
 
 export default App;
+//export { TrabajadorId };
 
 
