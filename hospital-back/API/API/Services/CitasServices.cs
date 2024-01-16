@@ -36,13 +36,33 @@ namespace API.Services
 				return new Result<ViewCita> { Model = null, Message = "La cita no es posible en ese horario. Elige otro.", Status = 400 };
 			}
 
+			var pacienteViejo = await _context.Pacientes.Where(paciente => paciente.Curp == cita.paciente.CURP).FirstOrDefaultAsync();
+
+
 			using var transaction = _context.Database.BeginTransaction();
 
 			try
 			{
-
 				PacientesServices spacientes = new(_context);
-				var paciente = await spacientes.CreatePaciente(cita.paciente);
+				Result<ViewPaciente> paciente = null;
+				if (pacienteViejo != null && cita.Nuevo)
+				{
+					return new Result<ViewCita> { Model = null, Message = "El paciente ya existe con ese CURP.", Status = 400 };
+				}
+				else if (pacienteViejo == null && !cita.Nuevo)
+				{
+					return new Result<ViewCita> { Model = null, Message = "El paciente no existe con ese CURP.", Status = 400 };
+				}
+				else if (pacienteViejo != null && !cita.Nuevo)
+				{
+					paciente = await spacientes.GetPacienteByCURP(cita.paciente.CURP);
+				}
+				else if (pacienteViejo == null)
+				{
+					paciente = await spacientes.CreatePaciente(cita.paciente);
+
+				}
+
 
 				if (paciente.Model == null)
 				{

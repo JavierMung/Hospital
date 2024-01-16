@@ -22,6 +22,7 @@ const WorkerDetails = ({ idTrabajador }) => {
         if (response.ok) {
           setLoad (true);
           setWorkerData(data.model);
+          setLoad (true);
         } else {
           setError(data.message || '1');
         }
