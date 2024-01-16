@@ -1,4 +1,4 @@
-  import React, { useState } from 'react';
+  import React, { useState, useEffect } from 'react';
   import './Cliente.css'
 
   const CreateAppointment = () => {
@@ -19,6 +19,7 @@
       idServicio: 1,
       status: ''
     });
+    const [medicos, setMedicos] = useState([]);
     const [appointments, setAppointments] = useState([]);
     const [error, setError] = useState('');
     const [formVisible, setFormVisible] = useState(false); 
@@ -59,19 +60,29 @@
       return localIsoDate;
     };
 
+    const fetchMedicos = async () => {
+      try {
+        const response = await fetch('https://localhost:7079/Medicos/obtenerMedicos');
+        if (!response.ok) {
+          throw new Error('No se pudieron obtener los médicos');
+        }
+        const data = await response.json();
+        setMedicos(data.model.medicos); // Asumiendo que la lista de médicos está en data.model.medicos
+      } catch (error) {
+        console.error(error);
+        setError('Error al cargar los médicos');
+      }
+    };
+
+    useEffect(() => {
+      fetchMedicos();
+    }, []);
     const handleSubmit = async (e) => {
 
-      // const fechaAlta = new Date(appointment.fechaAlta);
-      // fechaAlta.setDate(fechaAlta.getDate() + 1);
-      // const offset = fechaAlta.getTimezoneOffset() * 60000;
-      // const fechaISOlocal = (new Date(fechaAlta.getTime() - offset)).toISOString().slice(0, -1);
-      
       const fechaCita = new Date(appointment.fechaCita);
       fechaCita.setDate(fechaCita.getDate() + 1);
       const offset2 = fechaCita.getTimezoneOffset() * 60000;
       const fechaCitaISOlocal = (new Date(fechaCita.getTime() - offset2)).toISOString().slice(0, -1);
-
-
 
       let appointmentData = {...appointment};
       appointmentData.fechaAlta = getLocalIsoDate();
@@ -208,6 +219,24 @@
           
           {/* Campos para el médico, costo, servicio y estatus */}
           <input className="form-input" type="number" name="idMedico" placeholder="ID del Médico"  onChange={handleChange} />
+
+
+          <label htmlFor="idMedicoSelect">Médico:</label>
+          <select
+            id="idMedicoSelect"
+            name="idMedico"
+            value={appointment.idMedico}
+            onChange={handleChange}
+            className="form-input"
+          >
+            <option value="">--Selecciona un médico--</option>
+            {medicos.map(medico => (
+              <option key={medico.idMedico} value={medico.idMedico}>
+                {medico.nombre} - {medico.especialidad}
+              </option>
+            ))}
+          </select>
+
           {/* <input className="form-input" type="number" name="costo" placeholder="Costo"  onChange={handleChange} /> */}
           {/* <input className="form-input" type="number" name="idServicio" placeholder="ID del Servicio"  onChange={handleChange} /> */}
           {/* <input className="form-input" type="text" name="status" placeholder="Estado de la cita" value={appointment.status} onChange={handleChange} /> */}

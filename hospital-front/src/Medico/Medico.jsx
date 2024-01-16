@@ -6,6 +6,14 @@ const ManageAppointment = () => {
   const [citas, setCitas] = useState([]); // Estado para almacenar la lista de citas
   const [selectedCita, setSelectedCita] = useState(null); // Estado para la cita seleccionada
   const [error, setError] = useState('');
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [isPrescriptionFormVisible, setIsPrescriptionFormVisible] = useState(false);
+
+  const [prescription, setPrescription] = useState({
+    idCita: '',
+    posologia: ''
+  });
+
 // Estado que refleja la estructura completa del objeto cita para la actualización
 const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     id: 0,
@@ -37,7 +45,14 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
   // Y luego usarías la función para convertir la fecha antes de asignarla al valor del input:
   const fechaAltaFormatted = selectedCita ? toLocalDateTime(selectedCita.fechaAlta) : '';
   const fechaCitaFormatted = selectedCita ? toLocalDateTime(selectedCita.fechaCita) : '';
-  
+
+  const handleModifyClick = () => {
+    setIsFormVisible(!isFormVisible); // Cambia la visibilidad del formulario
+  };
+  const togglePrescriptionForm = () => {
+    setIsPrescriptionFormVisible(!isPrescriptionFormVisible);
+  };
+
   // Función para cargar las citas desde la API
   const fetchCitas = async () => {
     try {
@@ -52,15 +67,57 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     }
   };
 
-  
+  const handlePrescriptionChange = (e) => {
+    const { name, value } = e.target;
+    setPrescription({
+      ...prescription,
+      [name]: value
+    });
+  };
+
+  const handlePrescriptionSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('https://localhost:7079/RecetaMedica/agregarRecetaMedica', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(prescription)
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al enviar la receta médica');
+      }
+
+      // Lógica después de una receta médica exitosa
+      console.log('Receta médica creada exitosamente');
+      // Limpiar el formulario o actualizar el estado según sea necesario
+      setPrescription({ idCita: '', posologia: '' });
+
+    } catch (error) {
+      console.error('Error al enviar la receta médica:', error);
+      setError(error.message);
+    }
+  };
 
   // Función para enviar los datos actualizados de la cita a la API
   const handleSubmit = async (e) => {
+        const fechaAlta = new Date(appointmentToUpdate.fechaAlta);
+      fechaAlta.setDate(fechaAlta.getDate() + 1);
+      const offset = fechaAlta.getTimezoneOffset() * 60000;
+      const fechaISOlocal = (new Date(fechaAlta.getTime() - offset)).toISOString().slice(0, -1);
+      
+      const fechaCita = new Date(appointmentToUpdate.fechaCita);
+      fechaCita.setDate(fechaCita.getDate() + 1);
+      const offset2 = fechaCita.getTimezoneOffset() * 60000;
+      const fechaCitaISOlocal = (new Date(fechaCita.getTime() - offset2)).toISOString().slice(0, -1);
+
     e.preventDefault();
     const citaToUpdate = {
         ...appointmentToUpdate,
-        fechaAlta: new Date(appointmentToUpdate.fechaAlta).toISOString(),
-        fechaCita: new Date(appointmentToUpdate.fechaCita).toISOString(),
+        fechaAlta: fechaISOlocal,
+        fechaCita: fechaCitaISOlocal,
         paciente: { ...appointmentToUpdate.paciente },
         idMedico: appointmentToUpdate.medico.idMedico,
         costo: appointmentToUpdate.costo,
@@ -107,6 +164,10 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
         fechaAlta: cita.fechaAlta.split('.')[0], // Remove milliseconds
         fechaCita: cita.fechaCita.split('.')[0] // Remove milliseconds
       });
+      setPrescription(prevPrescription => ({
+        ...prevPrescription,
+        idCita: citaId
+      }));
     }
   };
   //Manejador cuando cambia el formulario
@@ -143,7 +204,10 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
           </option>
         ))}
       </select>
-      {selectedCita && (
+      <div>
+      <button onClick={handleModifyClick}>{isFormVisible ? 'Ocultar' : 'Modificar'}</button>
+      </div>
+      {selectedCita && isFormVisible && (
         <form onSubmit={handleSubmit} >
           <input className="form-input" type="hidden" name="id" value={appointmentToUpdate.id} readOnly/>
           <label>Fecha de Alta:</label>
@@ -179,8 +243,43 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
           </select>
           <button type="submit">Actualizar Cita</button>
         </form>
+  )}
+<div>
+    <button onClick={togglePrescriptionForm}>
+{isPrescriptionFormVisible ? 'Ocultar Formulario de Receta' : 'Agregar Receta Médica'}
+</button>
+
+</div>
+  {/* Formulario de receta médica que se muestra solo si isPrescriptionFormVisible es true */}
+  {isPrescriptionFormVisible && (
+    <form onSubmit={handlePrescriptionSubmit}>
+      <div>
+        <label htmlFor="idCita">ID de la Cita:</label>
+        <input
+          type="number"
+          id="idCita"
+          name="idCita"
+          value={prescription.idCita}
+          onChange={handlePrescriptionChange}
+        />
+      </div>
+      <div>
+        <label htmlFor="posologia">Posología:</label>
+        <input
+          type="text"
+          id="posologia"
+          name="posologia"
+          value={prescription.posologia}
+          onChange={handlePrescriptionChange}
+        />
+      </div>
+      <button type="submit">Enviar Receta</button>
+    </form>
   )}  
     {error && <p className="error-message">{error}</p>}
+
+
+
     </div>
   );
 };
