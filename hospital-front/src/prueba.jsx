@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 const WorkerDetails = ({ idTrabajador }) => {
   const [workerData, setWorkerData] = useState(null);
   const [error, setError] = useState('');
+  const [load, setLoad] = useState(false);
 
   useEffect(() => {
     const fetchWorkerData = async () => {
@@ -12,6 +13,7 @@ const WorkerDetails = ({ idTrabajador }) => {
 
         if (response.ok) {
           setWorkerData(data.model);
+          setLoad (true);
         } else {
           setError(data.message || 'Error al obtener los datos del trabajador');
         }
@@ -27,12 +29,12 @@ const WorkerDetails = ({ idTrabajador }) => {
   return (
     <div>
       <h2>Datos del Trabajador</h2>
-      {workerData ? (
+      {load ? (
         <div>
-          <p>ID: {workerData.model.idTrabajador}</p>
-          <p>Nombre: {workerData.model.persona.nombre}</p>
-          <p>Apellido Paterno: {workerData.model.persona.apellido_Paterno}</p>
-          <p>Apellido Materno: {workerData.model.persona.apellido_Materno}</p>
+          <p>ID: {workerData.idTrabajador}</p>
+          <p>Nombre: {workerData.persona.nombre}</p>
+          <p>Apellido Paterno: {workerData.persona.apellido_Paterno}</p>
+          <p>Apellido Materno: {workerData.persona.apellido_Materno}</p>
           
         </div>
       ) : (
