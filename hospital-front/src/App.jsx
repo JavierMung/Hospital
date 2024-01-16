@@ -20,25 +20,66 @@ const App = () => {
     username: null,
     idTrabajador: null,
   });
+  const [medicData, setMedicData] = useState({
+    idTrabajador: null,
+    idMedico: null,
+  });
 
   useEffect(() => {
     // Recuperar el estado del usuario desde localStorage al cargar la aplicación
     const storedUser = localStorage.getItem('user');
+    const storedMedic = localStorage.getItem('medicData')
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      if (storedMedic) {
+        setMedicData(JSON.parse(storedMedic));
+      }
     }
   }, []);
+
+  const obtenerIdMedico = async (idTrabajador) => {
+    try {
+      const response = await fetch(`https://localhost:7079/Medicos/obtenerCitasByTrabajadorId/${idTrabajador}`);
+      const data = await response.json();
+  
+      if (response.ok && data.status === 200) {
+        return data.model.idMedico;
+      } else {
+        console.error('Error al obtener el id del médico:', data.message);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener el id del médico:', error);
+      return null;
+    }
+  };
+  
 
   const handleUser = ({ idRol, username, idTrabajador }) => {
     setUser({ idRol, username, idTrabajador });
     // Guardar el estado del usuario en localStorage
     localStorage.setItem('user', JSON.stringify({ idRol, username, idTrabajador }));
+
+    // Verificar si el rol es médico (idRol igual a 5)
+    if (idRol === 5) {
+      // Obtener el id del médico y almacenarlo en el estado
+      obtenerIdMedico(idTrabajador)
+        .then((idMedico) => {
+          if (idMedico !== null) {
+            // Guardamos el id del médico y el id del trabajador en el estado
+            setMedicData({ idTrabajador, idMedico });
+            localStorage.setItem('medicData', JSON.stringify({ idTrabajador, idMedico }));
+          }
+        })
+        .catch((error) => console.error('Error al obtener el id del médico:', error));
+    }
   };
 
   const handleLogout = (role) => {
     setUser({ idRol: role, username: null, idTrabajador: null });
     // Eliminar el estado del usuario de localStorage al cerrar sesión
     localStorage.removeItem('user');
+    localStorage.removeItem('medicData');
   };
   
 
@@ -98,7 +139,7 @@ const App = () => {
             <Route path="/Admi/CrearMedico" element={<CreaM TrabId={user.idTrabajador}/>} />
             <Route path="/Admi/Administrador" element={<Admin TrabId={user.idTrabajador}/>} />
             <Route path="/Recepcionista/Recepsionista" element={<Receps TrabId={user.idTrabajador}/>} />
-            <Route path="/Medico/Medico" element={<Medico TrabId={user.idTrabajador}/>} />
+            <Route path="/Medico/Medico" element={<Medico mediData={medicData}/>} />
             <Route path="/Cliente/Cliente" element={<Cliente />} />
             <Route path="/Login" element={<Login onLogin={handleUser}/>} />
             <Route path="/Logout" element={<Logout onLogout={handleLogout}/>} />
@@ -114,6 +155,5 @@ const App = () => {
 };
 
 export default App;
-//export { TrabajadorId };
 
 

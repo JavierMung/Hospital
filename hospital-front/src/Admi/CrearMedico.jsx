@@ -63,7 +63,7 @@ const CrearMedico = () => {
   };
 
   return (
-    <div>
+    <div className='login-container2'>
       <h2>Crear Nuevo Médico</h2>
       <div>
         <label>ID Trabajador:</label>
