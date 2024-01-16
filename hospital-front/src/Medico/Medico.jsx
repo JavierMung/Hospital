@@ -5,7 +5,7 @@ const ManageAppointment = () => {
 
   const [citas, setCitas] = useState([]); // Estado para almacenar la lista de citas
   const [selectedCita, setSelectedCita] = useState(null); // Estado para la cita seleccionada
-
+  const [error, setError] = useState('');
 // Estado que refleja la estructura completa del objeto cita para la actualización
 const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     id: 0,
@@ -52,24 +52,42 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     }
   };
 
+  
+
   // Función para enviar los datos actualizados de la cita a la API
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const citaToUpdate = {
+        ...appointmentToUpdate,
+        fechaAlta: new Date(appointmentToUpdate.fechaAlta).toISOString(),
+        fechaCita: new Date(appointmentToUpdate.fechaCita).toISOString(),
+        paciente: { ...appointmentToUpdate.paciente },
+        idMedico: appointmentToUpdate.medico.idMedico,
+        costo: appointmentToUpdate.costo,
+        idServicio: appointmentToUpdate.idServicio,
+        status: appointmentToUpdate.status
+      };
+      if (citaToUpdate.medico) {
+        delete citaToUpdate.medico;
+      }
+    console.log(JSON.stringify(citaToUpdate));
     try {
       const response = await fetch('https://localhost:7079/Citas/actualizarCita', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(selectedCita)
+        body: JSON.stringify(citaToUpdate)
       });
-
       if (!response.ok) {
-        throw new Error('No se pudo actualizar la cita');
+        const errorData = await response.json();
+        console.error('Error Data:', errorData);
+        setError(errorData.message || 'Error al crear la cita.');
+        throw new Error('Hubo un error al actualizar la cita');
       }
       console.log('Cita actualizada con éxito');
     } catch (error) {
-      console.error(error);
+      console.error('Error al actualizar la cita:', error);
     }
   };
 
@@ -83,15 +101,35 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     const citaId = event.target.value;
     const cita = citas.find(c => c.id.toString() === citaId);
     setSelectedCita(cita);
+    if (cita) {
+      setAppointmentToUpdate({
+        ...cita,
+        fechaAlta: cita.fechaAlta.split('.')[0], // Remove milliseconds
+        fechaCita: cita.fechaCita.split('.')[0] // Remove milliseconds
+      });
+    }
   };
   //Manejador cuando cambia el formulario
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setSelectedCita((prevCita) => ({
-      ...prevCita,
-      [name]: value
-    }));
+    // Manejar los campos anidados del paciente
+    if (name.includes('.')) {
+      const [parentKey, childKey] = name.split('.');
+      setAppointmentToUpdate(prev => ({
+        ...prev,
+        [parentKey]: {
+          ...prev[parentKey],
+          [childKey]: value
+        }
+      }));
+    } else {
+      setAppointmentToUpdate(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
+
   
 
   return (
@@ -107,31 +145,33 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
       </select>
       {selectedCita && (
         <form onSubmit={handleSubmit} >
-          <input className="form-input" type="hidden" name="id" value={selectedCita.id} readOnly/>
+          <input className="form-input" type="hidden" name="id" value={appointmentToUpdate.id} readOnly/>
           <label>Fecha de Alta:</label>
-          <input className="form-input" type="datetime-local" name="fechaAlta" value={fechaAltaFormatted} onChange={handleFormChange} />
+          <input className="form-input" type="datetime-local" name="fechaAlta" value={appointmentToUpdate.fechaAlta} onChange={handleFormChange} />
           <label>Fecha de la Cita:</label>
-          <input className="form-input" type="datetime-local" name="fechaCita" value={selectedCita.fechaCita} onChange={handleFormChange} />
+          <input className="form-input" type="datetime-local" name="fechaCita" value={appointmentToUpdate.fechaCita} onChange={handleFormChange} />
           {/* Agrega campos para cada propiedad que necesites del objeto paciente */}
           <label>ID Paciente:</label>
-          <input className="form-input" type="number" name="idMedico" value={selectedCita.paciente.id} onChange={handleFormChange} />
+          <input className="form-input" type="number" name="id" value={appointmentToUpdate.paciente.id} onChange={handleFormChange} />
           <label>Nombre:</label>
-          <input className="form-input" type="text" name="nombre" value={selectedCita.paciente.nombre} onChange={handleFormChange} />
+          <input className="form-input" type="text" name="nombre" value={appointmentToUpdate.paciente.nombre} onChange={handleFormChange} />
           <label>Apellido Paterno:</label>
-          <input className="form-input" type="text" name="apellido_Paterno" value={selectedCita.paciente.apellido_Paterno} onChange={handleFormChange} />
+          <input className="form-input" type="text" name="apellido_Paterno" value={appointmentToUpdate.paciente.apellido_Paterno} onChange={handleFormChange} />
           <label>Appelido Materno:</label>
-          <input className="form-input" type="text" name="apellido_Materno" value={selectedCita.paciente.apellido_Materno} onChange={handleFormChange} />
+          <input className="form-input" type="text" name="apellido_Materno" value={appointmentToUpdate.paciente.apellido_Materno} onChange={handleFormChange} />
           <label>Edad:</label>
-          <input className="form-input" type="number" name="edad" value={selectedCita.paciente.edad} onChange={handleFormChange} />
+          <input className="form-input" type="number" name="edad" value={appointmentToUpdate.paciente.edad} onChange={handleFormChange} />
           <label>Curp:</label>
-          <input className="form-input" type="text" name="curp" value={selectedCita.paciente.curp} onChange={handleFormChange} />
+          <input className="form-input" type="text" name="curp" value={appointmentToUpdate.paciente.curp} onChange={handleFormChange} />
 
+          <label>IdMedico:</label>
+          <input className="form-input" type="number" name="idMedico" value={appointmentToUpdate.medico.idMedico} onChange={handleFormChange} />
           <label>Costo:</label>
-          <input className="form-input" type="number" name="costo" value={selectedCita.costo} onChange={handleFormChange} />
+          <input className="form-input" type="number" name="costo" value={appointmentToUpdate.costo} onChange={handleFormChange} />
           <label>ID Servicio:</label>
-          <input className="form-input" type="number" name="idServicio" value={selectedCita.idServicio} onChange={handleFormChange} />
+          <input className="form-input" type="number" name="idServicio" value={appointmentToUpdate.idServicio} onChange={handleFormChange} />
           <label>Estatus:</label>
-          <select className="form-input" name="status" value={selectedCita.status} onChange={handleFormChange}>
+          <select className="form-input" name="status" value={appointmentToUpdate.status} onChange={handleFormChange}>
             {/* Opciones de estatus */}
             <option value="En espera">En espera</option>
             <option value="Aprobada">Aprobada</option>
@@ -140,6 +180,7 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
           <button type="submit">Actualizar Cita</button>
         </form>
   )}  
+    {error && <p className="error-message">{error}</p>}
     </div>
   );
 };

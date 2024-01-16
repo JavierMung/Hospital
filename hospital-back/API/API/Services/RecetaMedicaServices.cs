@@ -60,7 +60,7 @@ namespace API.Services
 				return new Result<ViewRecetaMedica>()
 				{
 					Model = null,
-					Message = "Ocurrio un error al crear la receta.:" +e,
+					Message = "Ocurrio un error al crear la receta."+e,
 					Status = StatusCodes.Status500InternalServerError
 				};
 			}
