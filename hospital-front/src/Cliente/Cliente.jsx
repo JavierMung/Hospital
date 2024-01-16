@@ -16,7 +16,7 @@
       },
       idMedico: 0,
       costo: 0,
-      idServicio: 0,
+      idServicio: 1,
       status: ''
     });
     const [appointments, setAppointments] = useState([]);
@@ -52,7 +52,30 @@
       });
     };
 
+    const getLocalIsoDate = () => {
+      const now = new Date();
+      const timezoneOffset = now.getTimezoneOffset() * 60000; // Convertir la diferencia de zona horaria a milisegundos
+      const localIsoDate = new Date(now - timezoneOffset).toISOString().slice(0, -1); // Quitar la 'Z' del final
+      return localIsoDate;
+    };
+
     const handleSubmit = async (e) => {
+
+      // const fechaAlta = new Date(appointment.fechaAlta);
+      // fechaAlta.setDate(fechaAlta.getDate() + 1);
+      // const offset = fechaAlta.getTimezoneOffset() * 60000;
+      // const fechaISOlocal = (new Date(fechaAlta.getTime() - offset)).toISOString().slice(0, -1);
+      
+      const fechaCita = new Date(appointment.fechaCita);
+      fechaCita.setDate(fechaCita.getDate() + 1);
+      const offset2 = fechaCita.getTimezoneOffset() * 60000;
+      const fechaCitaISOlocal = (new Date(fechaCita.getTime() - offset2)).toISOString().slice(0, -1);
+
+
+
+      let appointmentData = {...appointment};
+      appointmentData.fechaAlta = getLocalIsoDate();
+      appointmentData.fechaCita = fechaCitaISOlocal;
       e.preventDefault();
       try {
         const response = await fetch('https://localhost:7079/Citas/crearCita', {
@@ -60,7 +83,7 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(appointment)
+          body: JSON.stringify(appointmentData)
         });
 
         if (!response.ok) {
@@ -113,22 +136,20 @@
     
     const cancelarCita = async (cita) => {
 
-      let fechaAltaDate = new Date(cita.fechaAlta);
-
-
       const fechaAlta = new Date(cita.fechaAlta);
-      fechaAlta.setDate(fechaAltaDate.getDate() + 1);
-      fechaAlta.setHours(fechaAltaDate.getHours(), fechaAltaDate.getMinutes(), fechaAltaDate.getSeconds());
-
+      fechaAlta.setDate(fechaAlta.getDate() + 1);
+      const offset = fechaAlta.getTimezoneOffset() * 60000;
+      const fechaISOlocal = (new Date(fechaAlta.getTime() - offset)).toISOString().slice(0, -1);
+      
       const fechaCita = new Date(cita.fechaCita);
       fechaCita.setDate(fechaCita.getDate() + 1);
-
-      console.log(cita.fechaAlta)
-      console.log(fechaAlta.toString())
+      const offset2 = fechaCita.getTimezoneOffset() * 60000;
+      const fechaCitaISOlocal = (new Date(fechaCita.getTime() - offset2)).toISOString().slice(0, -1);
+            
       const citaParaCancelar = {
         id: cita.id,
-        fechaAlta: fechaAlta.toString(),
-        fechaCita: new Date(fechaCita).toISOString(),
+        fechaAlta: fechaISOlocal,
+        fechaCita: fechaCitaISOlocal,
         paciente: {
           id: cita.paciente.id,
           nombre: cita.paciente.nombre,
@@ -140,7 +161,7 @@
         idMedico: cita.medico.idMedico,
         costo: cita.costo,
         idServicio: cita.idServicio,
-        status: "CANCELADO"
+        status: "Cancelada"
       };
       console.log(citaParaCancelar)
       try {
@@ -157,7 +178,9 @@
           console.error('Error al cancelar la cita:', errorData);
           setError(errorData.message || 'Error al cancelar la cita.');
           return;
-        }    
+        }else{
+          console.log('Cita actualizada con éxito');
+        }
       } catch (error) {
         console.error('Error al enviar la solicitud de cancelación:', error);
         setError(error.message);
@@ -173,7 +196,7 @@
         {formVisible && (
           <form onSubmit={handleSubmit} className='RegistrarCita'>
           {/* Campos para las fechas */}
-          <input className="form-input" type="datetime-local" name="fechaAlta" value={appointment.fechaAlta} onChange={handleChange} />
+          {/* <input className="form-input" type="datetime-local" type="hidden" readOnly name="fechaAlta" value={appointment.fechaAlta} onChange={handleChange} /> */}
           <input className="form-input" type="datetime-local" name="fechaCita" value={appointment.fechaCita} onChange={handleChange} />
       
           {/* Campos para los datos del paciente */}
@@ -185,10 +208,10 @@
           
           {/* Campos para el médico, costo, servicio y estatus */}
           <input className="form-input" type="number" name="idMedico" placeholder="ID del Médico"  onChange={handleChange} />
-          <input className="form-input" type="number" name="costo" placeholder="Costo"  onChange={handleChange} />
-          <input className="form-input" type="number" name="idServicio" placeholder="ID del Servicio"  onChange={handleChange} />
-          <input className="form-input" type="text" name="status" placeholder="Estado de la cita" value={appointment.status} onChange={handleChange} />
-      
+          {/* <input className="form-input" type="number" name="costo" placeholder="Costo"  onChange={handleChange} /> */}
+          {/* <input className="form-input" type="number" name="idServicio" placeholder="ID del Servicio"  onChange={handleChange} /> */}
+          {/* <input className="form-input" type="text" name="status" placeholder="Estado de la cita" value={appointment.status} onChange={handleChange} /> */}
+          
           {/* Botón para enviar el formulario */}
           <button className="form-button" type="submit">Crear Cita</button>
         </form>

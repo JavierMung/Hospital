@@ -54,7 +54,7 @@ namespace API.Services
 				};
 
 			}
-			catch (Exception ex e)
+			catch (Exception e)
 			{
 				transaction.Rollback();
 				return new Result<ViewRecetaMedica>()
@@ -79,7 +79,7 @@ namespace API.Services
 					{
 						Model = null,
 						Message = "No existe receta medica.",
-						Status = 400
+						Status = 204
 					};
 				}
 
