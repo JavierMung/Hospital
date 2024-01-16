@@ -16,7 +16,7 @@ function Recepcionista() {
       </div>
       <div>
         <p><br/></p>
-        <button className="button" onClick={() => setBotonSeleccionado("crear") }style={{margin:"10px"}}>Nuevo Ticket</button>
+        <button className="button" onClick={() => setBotonSeleccionado("crear") }style={{margin:"10px"}}>Agregar Ticket</button>
         <button className="button" onClick={() => setBotonSeleccionado("mostrar")}>Mostrar Ticket</button>
       </div>
     </div>

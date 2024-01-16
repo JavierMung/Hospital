@@ -22,17 +22,17 @@ const CrearTicket = () => {
       }, []);
 
   const enviarTicket = () => {
-    const insumosFiltrados = insumos.filter(insumo => insumo.cantidadInsumo && insumo.cantidadInsumo !== " ");
-    const serviciosFiltrados = servicios.filter(servicio => servicio.cantidadServicio && servicio.cantidadServicio !== " ");
+    idTrabajador;
+    const insumosFiltrados = insumos.filter(insumo =>insumo.cantidad && insumo.cantidadInsumo !== "");
+    const serviciosFiltrados = servicios.filter(servicio =>servicio.cantidad && servicio.cantidadServicio !== "");
     
     const ticket = {
-      idTrabajador,
-      insumos: insumosFiltrados.map((insumo) =>({ idInsumo: insumo.idInsumo, cantidad: insumo.cantidadInsumo })),
-      servicios:serviciosFiltrados.map((servicio) => ({ idServicio: servicio.idServicio, cantidad:servicio.cantidadServicio })),
+      "idTrabajador":idTrabajador,
     };
-    
     // Envía el ticket a la API Ticket/crearTicket
-    fetch("https://localhost:7079/Ticket/crearTicket", {
+    ticket.insumos = insumosFiltrados.map(insumo => ({ idInsumo: insumo.idInsumo, cantidad: insumo.cantidad }));
+    ticket.servicios = serviciosFiltrados.map(servicio => ({ idServicio: servicio.idServicio, cantidad: servicio.cantidad }));
+    fetch('https://localhost:7079/Ticket/crearTicket', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,13 +45,21 @@ const CrearTicket = () => {
           alert("Ticket creado correctamente");
         } else {
           alert(data.message);
+          window.location.href = "./Recepsionista";
         }
       });
+     // document.querySelectorAll("input[name='cantidad']").forEach((input) => input.value = " ");
   };
 
   return (
     <div>
       <h2>Crear Ticket</h2>
+      <p>
+        <input type="number"
+              placeholder="IdTrabajador"
+              value={idTrabajador}
+              onChange={() => setIdTrabajador(event.target.value)}/>
+      </p>
       <table>
         <thead>
           <tr>
@@ -116,12 +124,6 @@ const CrearTicket = () => {
       </tr>
       </tbody>
       </table>
-      <p>
-        <input type="number"
-              placeholder="IdTrabajador"
-              value={idTrabajador}
-              onChange={() => setIdTrabajador(event.target.value)}/>
-      </p>
       <button onClick={enviarTicket}>Crear Ticket</button>
     </div>
   );
