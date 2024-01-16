@@ -68,6 +68,7 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
         }));
         const recetasValidas = recetas.filter(receta => receta.model !== null);
         setRecetasMedicas(recetasValidas);
+        setError('Recetas médicas consultadas correcatemente')
     } catch (error) {
       console.error('Error al obtener recetas médicas:', error);
       setError(error.message);
@@ -111,8 +112,7 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
       }
 
       // Lógica después de una receta médica exitosa
-      console.log('Receta médica creada exitosamente');
-      // Limpiar el formulario o actualizar el estado según sea necesario
+      setError('Receta médica creada exitosamente');
       setPrescription({ idCita: '', posologia: '' });
 
     } catch (error) {
@@ -158,13 +158,11 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
       });
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error Data:', errorData);
         setError(errorData.message || 'Error al crear la cita.');
-        throw new Error('Hubo un error al actualizar la cita');
       }
-      console.log('Cita actualizada con éxito');
+      setError('La cita se ha actualizado correctamente.');
     } catch (error) {
-      console.error('Error al actualizar la cita:', error);
+      setError(error);
     }
   };
 
@@ -225,21 +223,19 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     ))}
   </select>
   <div>
-    <button onClick={handleModifyClick}>{isFormVisible ? 'Ocultar' : 'Modificar'}</button>
+    <button onClick={handleModifyClick}>{isFormVisible ? 'Ocultar' : 'Visualizar'}</button>
   </div>
   {selectedCita && isFormVisible && (
   <form onSubmit={handleSubmit}>
     <input className="form-input" type="hidden" name="id" value={appointmentToUpdate.id} readOnly />
     <label>Fecha de Alta:</label>
-    <input className="form-input" type="datetime-local" name="fechaAlta" value={appointmentToUpdate.fechaAlta}
-      onChange={handleFormChange} />
+    <input className="form-input" type="hidden"  name="fechaAlta" value={appointmentToUpdate.fechaAlta} readOnly/>
     <label>Fecha de la Cita:</label>
     <input className="form-input" type="datetime-local" name="fechaCita" value={appointmentToUpdate.fechaCita}
       onChange={handleFormChange} />
     {/* Agrega campos para cada propiedad que necesites del objeto paciente */}
     <label>ID Paciente:</label>
-    <input className="form-input" type="number" name="id" value={appointmentToUpdate.paciente.id}
-      onChange={handleFormChange} />
+    <input className="form-input" type="hidden" name="id" value={appointmentToUpdate.paciente.id} readOnly/>
     <label>Nombre:</label>
     <input className="form-input" type="text" name="nombre" value={appointmentToUpdate.paciente.nombre}
       onChange={handleFormChange} />
@@ -257,14 +253,11 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
       onChange={handleFormChange} />
 
     <label>IdMedico:</label>
-    <input className="form-input" type="number" name="idMedico" value={appointmentToUpdate.medico.idMedico}
-      onChange={handleFormChange} />
+    <input className="form-input" type="hidden" name="idMedico" value={appointmentToUpdate.medico.idMedico} readOnly/>
     <label>Costo:</label>
-    <input className="form-input" type="number" name="costo" value={appointmentToUpdate.costo}
-      onChange={handleFormChange} />
+    <input className="form-input" type="hidden" name="costo" value={appointmentToUpdate.costo} readOnly/>
     <label>ID Servicio:</label>
-    <input className="form-input" type="number" name="idServicio" value={appointmentToUpdate.idServicio}
-      onChange={handleFormChange} />
+    <input className="form-input" type="hidden" name="idServicio" value={appointmentToUpdate.idServicio} readOnly/>
     <label>Estatus:</label>
     <select className="form-input" name="status" value={appointmentToUpdate.status} onChange={handleFormChange}>
       {/* Opciones de estatus */}
@@ -286,7 +279,7 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
   <form onSubmit={handlePrescriptionSubmit}>
     <div>
       <label htmlFor="idCita">ID de la Cita:</label>
-      <input type="number" id="idCita" name="idCita" value={prescription.idCita} onChange={handlePrescriptionChange} />
+      <input type="hidden" id="idCita" name="idCita" value={prescription.idCita} readOnly />
     </div>
     <div>
       <label htmlFor="posologia">Posología:</label>

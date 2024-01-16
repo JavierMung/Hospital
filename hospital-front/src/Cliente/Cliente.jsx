@@ -102,11 +102,11 @@
           console.error('Error Data:', errorData);
           setError(errorData.message || 'Error al crear la cita.');
           return;
+        }else{
+          const responseData = await response.json();
+          setError(`Cita creada con éxito. Folio: ${responseData.model.id} , Nombre: ${responseData.model.paciente.nombre} ${responseData.model.paciente.apellido_Paterno} ${responseData.model.paciente.apellido_Materno} , Especialidad: ${responseData.model.medico.especialidad} , Fecha: ${responseData.model.fechaCita} , Consultorio:${responseData.model.medico.consultorio}`);
+          console.log('Cita creada exitosamente', responseData);
         }
-
-        const responseData = await response.json();
-        console.log('Cita creada exitosamente', responseData);
-        // Realiza acciones adicionales como limpiar el formulario o actualizar el estado
 
       } catch (error) {
         console.error('Error al enviar los datos:', error);
@@ -130,7 +130,7 @@
 
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('Error Data:', errorData);
+          // console.error('Error Data:', errorData);
           setError(errorData.message || 'Error al obtener las citas.');
           return;
         }
@@ -140,8 +140,8 @@
         setAppointments(responseData.model); // Guardamos las citas en el estado
 
       } catch (error) {
-        console.error('Error al obtener las citas:', error);
-        setError(error.message);
+        // console.error('Error al obtener las citas:', error);
+        setError('No se encontraron citas con esa CURP');
       }
     };
     
@@ -186,14 +186,12 @@
     
         if (!response.ok) {
           const errorData = await response.json();
-          console.error('Error al cancelar la cita:', errorData);
           setError(errorData.message || 'Error al cancelar la cita.');
           return;
         }else{
-          console.log('Cita actualizada con éxito');
+          setError('Cita cancelada con éxito')
         }
       } catch (error) {
-        console.error('Error al enviar la solicitud de cancelación:', error);
         setError(error.message);
       }
     };
@@ -218,7 +216,7 @@
           <input className="form-input" type="text" name="curp" placeholder="CURP"  onChange={handlePatientChange} />
           
           {/* Campos para el médico, costo, servicio y estatus */}
-          <input className="form-input" type="number" name="idMedico" placeholder="ID del Médico"  onChange={handleChange} />
+          <input className="form-input" type="hidden" name="idMedico" placeholder="ID del Médico"  readOnly/>
 
 
           <label htmlFor="idMedicoSelect">Médico:</label>
