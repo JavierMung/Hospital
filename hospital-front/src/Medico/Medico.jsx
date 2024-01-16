@@ -8,6 +8,8 @@ const ManageAppointment = () => {
   const [error, setError] = useState('');
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isPrescriptionFormVisible, setIsPrescriptionFormVisible] = useState(false);
+  const [recetasMedicas, setRecetasMedicas] = useState([]);
+
 
   const [prescription, setPrescription] = useState({
     idCita: '',
@@ -53,6 +55,24 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
     setIsPrescriptionFormVisible(!isPrescriptionFormVisible);
   };
 
+  const fetchRecetasMedicas = async () => {
+    try {
+      const recetas = await Promise.all(citas.map(async (cita) => {
+        const response = await fetch(`https://localhost:7079/RecetaMedica/obtenerRecetaMedicabyIdCita/${cita.id}`);
+        if (!
+        response.ok && response.status !== 204) { // 204 No Content, significa que no hay receta para esa cita
+        throw new Error('Error al obtener la receta médica');
+        }
+        const data = await response.json();
+        return data; // La API devuelve un objeto que incluye model, message y status
+        }));
+        const recetasValidas = recetas.filter(receta => receta.model !== null);
+        setRecetasMedicas(recetasValidas);
+    } catch (error) {
+      console.error('Error al obtener recetas médicas:', error);
+      setError(error.message);
+    }
+  };
   // Función para cargar las citas desde la API
   const fetchCitas = async () => {
     try {
@@ -194,94 +214,112 @@ const [appointmentToUpdate, setAppointmentToUpdate] = useState({
   
 
   return (
-    <div className="form-container">
-      <label htmlFor="citaSelect">Selecciona una cita:</label>
-      <select id="citaSelect" onChange={handleSelectChange}>
-        <option value="">--Selecciona una cita--</option>
-        {citas.map((cita) => (
-          <option key={cita.id} value={cita.id}>
-            {`Cita ID: ${cita.id}, Paciente: ${cita.paciente.nombre}`}
-          </option>
-        ))}
-      </select>
-      <div>
-      <button onClick={handleModifyClick}>{isFormVisible ? 'Ocultar' : 'Modificar'}</button>
-      </div>
-      {selectedCita && isFormVisible && (
-        <form onSubmit={handleSubmit} >
-          <input className="form-input" type="hidden" name="id" value={appointmentToUpdate.id} readOnly/>
-          <label>Fecha de Alta:</label>
-          <input className="form-input" type="datetime-local" name="fechaAlta" value={appointmentToUpdate.fechaAlta} onChange={handleFormChange} />
-          <label>Fecha de la Cita:</label>
-          <input className="form-input" type="datetime-local" name="fechaCita" value={appointmentToUpdate.fechaCita} onChange={handleFormChange} />
-          {/* Agrega campos para cada propiedad que necesites del objeto paciente */}
-          <label>ID Paciente:</label>
-          <input className="form-input" type="number" name="id" value={appointmentToUpdate.paciente.id} onChange={handleFormChange} />
-          <label>Nombre:</label>
-          <input className="form-input" type="text" name="nombre" value={appointmentToUpdate.paciente.nombre} onChange={handleFormChange} />
-          <label>Apellido Paterno:</label>
-          <input className="form-input" type="text" name="apellido_Paterno" value={appointmentToUpdate.paciente.apellido_Paterno} onChange={handleFormChange} />
-          <label>Appelido Materno:</label>
-          <input className="form-input" type="text" name="apellido_Materno" value={appointmentToUpdate.paciente.apellido_Materno} onChange={handleFormChange} />
-          <label>Edad:</label>
-          <input className="form-input" type="number" name="edad" value={appointmentToUpdate.paciente.edad} onChange={handleFormChange} />
-          <label>Curp:</label>
-          <input className="form-input" type="text" name="curp" value={appointmentToUpdate.paciente.curp} onChange={handleFormChange} />
+<div className="form-container">
+  <label htmlFor="citaSelect">Selecciona una cita:</label>
+  <select id="citaSelect" onChange={handleSelectChange}>
+    <option value="">--Selecciona una cita--</option>
+    {citas.map((cita) => (
+    <option key={cita.id} value={cita.id}>
+      {`Cita ID: ${cita.id}, Paciente: ${cita.paciente.nombre}`}
+    </option>
+    ))}
+  </select>
+  <div>
+    <button onClick={handleModifyClick}>{isFormVisible ? 'Ocultar' : 'Modificar'}</button>
+  </div>
+  {selectedCita && isFormVisible && (
+  <form onSubmit={handleSubmit}>
+    <input className="form-input" type="hidden" name="id" value={appointmentToUpdate.id} readOnly />
+    <label>Fecha de Alta:</label>
+    <input className="form-input" type="datetime-local" name="fechaAlta" value={appointmentToUpdate.fechaAlta}
+      onChange={handleFormChange} />
+    <label>Fecha de la Cita:</label>
+    <input className="form-input" type="datetime-local" name="fechaCita" value={appointmentToUpdate.fechaCita}
+      onChange={handleFormChange} />
+    {/* Agrega campos para cada propiedad que necesites del objeto paciente */}
+    <label>ID Paciente:</label>
+    <input className="form-input" type="number" name="id" value={appointmentToUpdate.paciente.id}
+      onChange={handleFormChange} />
+    <label>Nombre:</label>
+    <input className="form-input" type="text" name="nombre" value={appointmentToUpdate.paciente.nombre}
+      onChange={handleFormChange} />
+    <label>Apellido Paterno:</label>
+    <input className="form-input" type="text" name="apellido_Paterno"
+      value={appointmentToUpdate.paciente.apellido_Paterno} onChange={handleFormChange} />
+    <label>Appelido Materno:</label>
+    <input className="form-input" type="text" name="apellido_Materno"
+      value={appointmentToUpdate.paciente.apellido_Materno} onChange={handleFormChange} />
+    <label>Edad:</label>
+    <input className="form-input" type="number" name="edad" value={appointmentToUpdate.paciente.edad}
+      onChange={handleFormChange} />
+    <label>Curp:</label>
+    <input className="form-input" type="text" name="curp" value={appointmentToUpdate.paciente.curp}
+      onChange={handleFormChange} />
 
-          <label>IdMedico:</label>
-          <input className="form-input" type="number" name="idMedico" value={appointmentToUpdate.medico.idMedico} onChange={handleFormChange} />
-          <label>Costo:</label>
-          <input className="form-input" type="number" name="costo" value={appointmentToUpdate.costo} onChange={handleFormChange} />
-          <label>ID Servicio:</label>
-          <input className="form-input" type="number" name="idServicio" value={appointmentToUpdate.idServicio} onChange={handleFormChange} />
-          <label>Estatus:</label>
-          <select className="form-input" name="status" value={appointmentToUpdate.status} onChange={handleFormChange}>
-            {/* Opciones de estatus */}
-            <option value="En espera">En espera</option>
-            <option value="Aprobada">Aprobada</option>
-            <option value="Cancelada">Cancelada</option>
-          </select>
-          <button type="submit">Actualizar Cita</button>
-        </form>
+    <label>IdMedico:</label>
+    <input className="form-input" type="number" name="idMedico" value={appointmentToUpdate.medico.idMedico}
+      onChange={handleFormChange} />
+    <label>Costo:</label>
+    <input className="form-input" type="number" name="costo" value={appointmentToUpdate.costo}
+      onChange={handleFormChange} />
+    <label>ID Servicio:</label>
+    <input className="form-input" type="number" name="idServicio" value={appointmentToUpdate.idServicio}
+      onChange={handleFormChange} />
+    <label>Estatus:</label>
+    <select className="form-input" name="status" value={appointmentToUpdate.status} onChange={handleFormChange}>
+      {/* Opciones de estatus */}
+      <option value="En espera">En espera</option>
+      <option value="Aprobada">Aprobada</option>
+      <option value="Cancelada">Cancelada</option>
+    </select>
+    <button type="submit">Actualizar Cita</button>
+  </form>
   )}
-<div>
+  <div>
     <button onClick={togglePrescriptionForm}>
-{isPrescriptionFormVisible ? 'Ocultar Formulario de Receta' : 'Agregar Receta Médica'}
-</button>
+      {isPrescriptionFormVisible ? 'Ocultar Formulario de Receta' : 'Agregar Receta Médica'}
+    </button>
 
-</div>
+  </div>
   {/* Formulario de receta médica que se muestra solo si isPrescriptionFormVisible es true */}
   {isPrescriptionFormVisible && (
-    <form onSubmit={handlePrescriptionSubmit}>
-      <div>
-        <label htmlFor="idCita">ID de la Cita:</label>
-        <input
-          type="number"
-          id="idCita"
-          name="idCita"
-          value={prescription.idCita}
-          onChange={handlePrescriptionChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="posologia">Posología:</label>
-        <input
-          type="text"
-          id="posologia"
-          name="posologia"
-          value={prescription.posologia}
-          onChange={handlePrescriptionChange}
-        />
-      </div>
-      <button type="submit">Enviar Receta</button>
-    </form>
-  )}  
-    {error && <p className="error-message">{error}</p>}
-
-
-
+  <form onSubmit={handlePrescriptionSubmit}>
+    <div>
+      <label htmlFor="idCita">ID de la Cita:</label>
+      <input type="number" id="idCita" name="idCita" value={prescription.idCita} onChange={handlePrescriptionChange} />
     </div>
-  );
+    <div>
+      <label htmlFor="posologia">Posología:</label>
+      <input type="text" id="posologia" name="posologia" value={prescription.posologia}
+        onChange={handlePrescriptionChange} />
+    </div>
+    <button type="submit">Enviar Receta</button>
+  </form>
+  )}
+  <div>
+  <button onClick={fetchRecetasMedicas}>Obtener Recetas Médicas</button>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>ID Cita</th>
+        <th>Posología
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {recetasMedicas.map((receta) => (
+        <tr key={receta.model.idRecetaMedica}>
+          <td>{receta.model.idRecetaMedica}</td>
+          <td>{receta.model.posologia}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  {error && <p className="error-message">{error}</p>}
+
+</div>
+);
 };
 
 export default ManageAppointment;
